@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b4f8a">
+<title>Muestreo Top 50</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#fff; --ink:#16202c; --muted:#5d6b7a; --line:#e2e7ee;
+  --brand:#0b4f8a; --brand-soft:#e7f0f9;
+  --ok:#1a7f4b; --ok-soft:#e5f5ec; --warn:#b26a00; --warn-soft:#fff3df; --bad:#c0352b; --bad-soft:#fde9e7;
+  --radius:12px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+header h1{font-size:18px;margin:0;font-weight:700}
+header .sub{font-size:13px;opacity:.85}
+header .quien{float:right;background:rgba(255,255,255,.16);border:0;color:#fff;border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:640px;margin:0 auto;padding:12px 12px 130px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.muted{color:var(--muted)} .small{font-size:13px}
+.btn{border:0;border-radius:12px;padding:13px 16px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;font-size:16px}
+.btn.sec{background:var(--brand-soft);color:var(--brand)}
+.btn.ok{background:var(--ok)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.grande{width:100%;padding:18px;font-size:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+select,input[type=search],input[type=text],textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+textarea{min-height:64px;resize:vertical}
+.seg{display:flex;background:var(--line);border-radius:12px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;padding:10px;border-radius:10px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button.on{background:#fff;color:var(--brand);box-shadow:var(--shadow)}
+.prog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.fila{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sync{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--ok-soft);color:var(--ok);white-space:nowrap}
+.sync.pend{background:var(--warn-soft);color:var(--warn)}
+.it{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:11px 12px;margin-bottom:6px;cursor:pointer}
+.it .d{flex:1;min-width:0}
+.it .d b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .d small{color:var(--muted);font-size:12px}
+.it .q{min-width:54px;text-align:center;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;border-radius:8px;padding:4px 6px;background:var(--bg);color:var(--muted)}
+.it .q.si{background:var(--brand-soft);color:var(--brand)}
+.it .ck{width:22px;text-align:center;color:var(--ok);font-weight:700}
+.titulo{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:16px 4px 6px}
+.aviso{padding:12px 14px;border-radius:10px;margin-bottom:10px;font-size:14px}
+.aviso.ok{background:var(--ok-soft);color:var(--ok)} .aviso.warn{background:var(--warn-soft);color:var(--warn)} .aviso.bad{background:var(--bad-soft);color:var(--bad)}
+.barra{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;justify-content:center;z-index:20}
+.barra .btn{flex:1;max-width:420px}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.5);display:flex;align-items:flex-end;justify-content:center;z-index:60}
+.modal .card{width:100%;max-width:520px;margin:0;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+@media (min-width:700px){.modal{align-items:center}.modal .card{border-radius:16px}}
+.paso{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0}
+.paso button{width:64px;height:64px;border-radius:50%;border:0;background:var(--brand-soft);color:var(--brand);font-size:30px;font-weight:700;cursor:pointer}
+.paso input{width:120px;text-align:center;font-size:34px;font-weight:700;padding:8px;border:2px solid var(--line);border-radius:12px;font-variant-numeric:tabular-nums}
+.res3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.res3 div{background:var(--bg);border-radius:10px;padding:8px 10px}
+.res3 b{display:block;font-size:18px} .res3 span{font-size:11px;color:var(--muted)}
+.dif{border-left:4px solid var(--bad)}
+.dif .n{font-variant-numeric:tabular-nums}
+.cargando{text-align:center;padding:40px;color:var(--muted)}
+/* Escáner */
+#scan{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+#scan.on{display:flex}
+#scan video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#scan .marco{position:absolute;left:8%;right:8%;top:28%;height:22%;border:3px solid rgba(255,255,255,.9);border-radius:14px;box-shadow:0 0 0 2000px rgba(0,0,0,.35)}
+#scan .marco.ok{border-color:#3ddc84} #scan .marco.mal{border-color:#ff5a4e}
+#scan .top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;color:#fff}
+#scan .top button{background:rgba(0,0,0,.45);color:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:700;cursor:pointer}
+#scan .ayuda{position:absolute;left:0;right:0;top:calc(28% - 40px);text-align:center;color:#fff;font-size:14px;z-index:2;text-shadow:0 1px 3px #000}
+#scan .panel{position:absolute;left:0;right:0;bottom:0;z-index:3;background:#fff;border-radius:16px 16px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}
+.digita{margin:8px 0 4px}
+.ult{background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;margin:10px 0}
+.ul{display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.ul:first-of-type{border-top:0}
+.ul .ic{font-size:18px;width:24px;text-align:center}
+.ul .d{flex:1;min-width:0}
+.ul .d b{display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ul .d small{color:var(--muted);font-size:12px}
+.ul .n{font-weight:700;font-size:17px;color:var(--brand);font-variant-numeric:tabular-nums}
+.ul.mal .d b{color:var(--bad)}
+#scan .panel .ult{box-shadow:none;padding:0;margin:8px 0 0}
+.toast{position:fixed;left:50%;top:calc(84px + env(safe-area-inset-top));transform:translateX(-50%);z-index:70;background:#16202c;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;max-width:90%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.toast.ok{background:var(--ok)} .toast.mal{background:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <button class="quien" id="quienBtn" style="display:none"></button>
+  <h1>Muestreo Top 50</h1>
+  <div class="sub" id="sub"></div>
+</header>
+<main id="app"><div class="cargando">Cargando…</div></main>
+<div class="barra" id="barra" style="display:none"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<div id="scan">
+  <video id="video" playsinline muted autoplay></video>
+  <div class="marco" id="marco"></div>
+  <div class="top">
+    <button id="scCerrar">✕ Cerrar</button>
+    <span></span>
+    <button id="scLuz" style="display:none">💡</button>
+  </div>
+  <div class="ayuda" id="scAyuda">Apunta al código de barras</div>
+  <div class="panel" id="scPanel"></div>
+</div>
+<input type="file" id="foto" accept="image/*" capture="environment" style="display:none">
+
+<script>
+var TOKEN = new URLSearchParams(location.search).get('m') || '';
+var BD_URL = 'https:\/\/cdn.jsdelivr.net\/npm\/barcode-detector@3.2.2\/dist\/iife\/ponyfill.min.js';
+var FORMATOS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'];
+var METODO = {'Cámara': '📷', 'Foto': '📸', 'Digitado': '⌨️'};
+var S = {d: null, quien: '', busca: '', local: {}, met: {}, pend: {}, lect: [], ult: [], sync: 'ok', modo: 'cantidad'};
+
+var API = 'https:\/\/script.google.com\/macros\/s\/AKfycbxvxIW9iw7D6IyKTMx5Xyj9BW4d_u7G4BMVwRzaI9ug1MIB1tdfVCAWhu2iIWjbz0lgMA\/exec';
+/* Llama al servidor por fetch (text/plain evita la consulta previa de CORS) */
+function call(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return fetch(API, {method: 'POST', body: JSON.stringify({fn: fn, args: args}), headers: {'Content-Type': 'text/plain;charset=utf-8'}})
+    .then(function (r) { if (!r.ok) throw new Error('Sin conexión con el servidor (' + r.status + ').'); return r.json(); },
+          function () { throw new Error('Sin conexión. Revisa el internet e intenta de nuevo.'); })
+    .then(function (j) {
+      if (!j.ok) throw new Error(j.error || 'Error del servidor.');
+      var d = j.r;
+      if (fn === 'apiMueInit' && d) {
+        d.enlace = location.origin + location.pathname + '?m=' + encodeURIComponent(TOKEN);
+        document.title = 'Muestreo Top 50 · ' + d.tienda;
+      }
+      return d;
+    });
+}
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+function dinero(n) { return (n < 0 ? '-$' : '$') + Math.abs(n || 0).toLocaleString('es-EC', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function leerLS(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+function guardarLS(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function fechaCorta(s) { var p = String(s).split('-'); var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getUTCDay()] + ' ' + p[2] + '/' + p[1]; }
+function hora(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+function toast(m, tipo) {
+  $('toast').innerHTML = '<div class="toast ' + (tipo || '') + '">' + esc(m) + '</div>';
+  clearTimeout(toast.t); toast.t = setTimeout(function () { $('toast').innerHTML = ''; }, 2200);
+}
+function error(e) { toast(e.message || String(e), 'mal'); }
+
+/* ---------- Datos ---------- */
+function iniciar() {
+  call('apiMueInit', TOKEN).then(function (d) {
+    S.d = d; S.quien = leerLS('mue.quien.' + TOKEN);
+    if (S.quien && d.personas.indexOf(S.quien) < 0) S.quien = '';
+    cargarLocal(); pintar();
+    if (d.items.length) setTimeout(function () { detector().catch(function () {}); }, 1500);
+  }).catch(function (e) { $('app').innerHTML = '<div class="aviso bad">' + esc(e.message) + '</div>'; });
+}
+
+function recargar() {
+  return call('apiMueInit', TOKEN).then(function (d) { S.d = d; cargarLocal(); pintar(); });
+}
+
+function claveLocal() { return 'mue2.' + TOKEN + '.' + S.d.semana + '.r' + S.d.ronda + '.' + S.quien; }
+
+/* Lo guardado en el teléfono manda sobre lo del servidor solo si aún no se envió */
+function cargarLocal() {
+  if (!S.quien || !S.d) return;
+  var x = {};
+  try { x = JSON.parse(leerLS(claveLocal()) || '{}'); } catch (e) {}
+  S.local = x.l || {}; S.met = x.m || {}; S.pend = x.p || {}; S.lect = x.q || []; S.ult = x.u || [];
+  S.d.conteos.forEach(function (c) { if (c.p === S.quien && !S.pend[c.cod]) { S.local[c.cod] = c.n; S.met[c.cod] = c.m; } });
+}
+function guardarLocal() { guardarLS(claveLocal(), JSON.stringify({l: S.local, m: S.met, p: S.pend, q: S.lect, u: S.ult})); }
+
+/* Registra una lectura (las 3 últimas quedan a la vista; todas se envían al servidor) */
+function anotar(raw, it, metodo, n) {
+  var l = {t: Date.now(), raw: String(raw), cod: it ? it.cod : '', desc: it ? it.desc : '', m: metodo, n: n == null ? '' : n, ok: !!it};
+  S.ult.unshift(l); S.ult = S.ult.slice(0, 3);
+  S.lect.push(l);
+  guardarLocal(); programarEnvio(); pintarUltimos();
+}
+
+function sumarMetodo(prev, m) {
+  var a = String(prev || '').split(' y ').filter(Boolean);
+  if (a.indexOf(m) < 0) a.push(m);
+  return a.join(' y ');
+}
+
+function fijar(it, n, metodo, raw) {
+  n = Math.max(0, Math.round(Number(n) || 0));
+  S.local[it.cod] = n; S.met[it.cod] = sumarMetodo(S.met[it.cod], metodo); S.pend[it.cod] = true;
+  anotar(raw, it, metodo, n);
+}
+
+function programarEnvio() { clearTimeout(programarEnvio.t); programarEnvio.t = setTimeout(enviarPendientes, 700); pintarSync(); }
+
+function enviarPendientes() {
+  var keys = Object.keys(S.pend), lect = S.lect.slice();
+  if ((!keys.length && !lect.length) || enviarPendientes.ocupado) return Promise.resolve();
+  enviarPendientes.ocupado = true;
+  var lista = keys.map(function (c) { return {cod: c, n: S.local[c], m: S.met[c]}; });
+  return call('apiMueGuardar', TOKEN, S.quien, S.d.ronda, lista, lect).then(function () {
+    keys.forEach(function (c) { delete S.pend[c]; });
+    S.lect = S.lect.slice(lect.length);
+    lista.forEach(function (c) {
+      var ya = S.d.conteos.filter(function (y) { return y.p === S.quien && y.cod === c.cod; })[0];
+      if (ya) { ya.n = c.n; ya.m = c.m; } else S.d.conteos.push({p: S.quien, cod: c.cod, n: c.n, m: c.m});
+    });
+    guardarLocal(); S.sync = 'ok';
+  }).catch(function (e) {
+    S.sync = /cerr/i.test(e.message) ? 'cerrado' : 'error';
+    if (S.sync === 'cerrado') toast(e.message, 'mal');
+  }).then(function () {
+    enviarPendientes.ocupado = false; pintarSync();
+    if ((Object.keys(S.pend).length || S.lect.length) && S.sync === 'ok') programarEnvio();
+  });
+}
+function hayPendientes() { return Object.keys(S.pend).length + S.lect.length; }
+setInterval(function () { if (S.d && hayPendientes()) enviarPendientes(); }, 15000);
+window.addEventListener('online', function () { enviarPendientes(); });
+
+function miCant(cod) { var v = S.local[cod]; return v == null ? null : v; }
+function contadoPorAlguien(cod) { return miCant(cod) != null || S.d.conteos.some(function (c) { return c.cod === cod; }); }
+function esGerente() { return S.quien && S.quien === S.d.gerente; }
+
+/* ---------- Pantallas ---------- */
+function pintar() {
+  var d = S.d;
+  $('sub').textContent = d.tienda + ' · ' + d.semana.replace('-S', ' · semana ') + (d.fase !== 'Enviado' && d.items.length ? ' · enviar hasta el ' + fechaCorta(d.vence) : '');
+  $('quienBtn').style.display = S.quien ? '' : 'none';
+  $('quienBtn').textContent = S.quien ? '👤 ' + S.quien : '';
+  $('barra').style.display = 'none';
+  if (!d.items.length) {
+    $('app').innerHTML = '<div class="card" style="text-align:center;padding:30px 16px"><div style="font-size:40px">🗓️</div><b>Todavía no hay lista para esta semana</b>' +
+      '<p class="muted small">La lista de 50 productos se publica los lunes. Vuelve a abrir este enlace cuando te avisen.</p></div>';
+    return;
+  }
+  if (!S.quien) return pintarQuien();
+  if (d.fase === 'Por enviar') return pintarExplicar();
+  if (d.fase === 'Enviado') return pintarEnviado();
+  pintarConteo();
+}
+
+function pintarQuien() {
+  var d = S.d;
+  $('app').innerHTML = '<div class="card"><b style="font-size:17px">¿Quién está contando?</b>' +
+    '<p class="muted small" style="margin:4px 0 12px">Elige tu nombre. Lo que cuentes queda guardado a tu nombre.</p>' +
+    '<select id="selQuien"><option value="">Elige tu nombre…</option>' + d.personas.map(function (n) {
+      return '<option>' + esc(n) + '</option>'; }).join('') + '</select>' +
+    '<button class="btn" id="okQuien" style="width:100%;margin-top:12px">Continuar</button></div>';
+  $('okQuien').onclick = function () {
+    var v = $('selQuien').value; if (!v) return;
+    S.quien = v; guardarLS('mue.quien.' + TOKEN, v); cargarLocal(); pintar();
+  };
+}
+
+function itemsVisibles() {
+  var q = S.busca.trim().toLowerCase();
+  return S.d.items.filter(function (i) {
+    return !q || (i.cod + ' ' + i.desc + ' ' + i.barras.join(' ')).toLowerCase().indexOf(q) >= 0;
+  });
+}
+
+function pintarConteo() {
+  var d = S.d, r2 = d.ronda === 2;
+  var hechos = d.items.filter(function (i) { return contadoPorAlguien(i.cod); }).length;
+  var h = '';
+  if (r2) h += '<div class="aviso warn"><b>Segundo conteo.</b> ' + d.items.length + ' producto' + (d.items.length === 1 ? '' : 's') +
+    ' no cuadró en el primer conteo. Que los cuente otra persona.</div>';
+  h += '<div class="card"><div class="fila"><b>' + hechos + ' de ' + d.items.length + ' productos contados</b><span id="sync"></span></div>' +
+    '<div class="prog"><i style="width:' + Math.round(hechos * 100 / d.items.length) + '%"></i></div>' +
+    '<p class="small muted" style="margin:8px 0 0">' + misHtml() + 'Cuenta todas las unidades de cada producto que haya en la tienda.</p></div>';
+  if (esGerente()) h += '<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn sec" id="bRepartir" style="flex:1;font-size:14px">👥 Repartir la lista</button>' +
+    '<button class="btn sec" id="bCompartir" style="flex:1;font-size:14px">🔗 Enlace para el equipo</button></div>';
+  h += '<button class="btn grande" id="bScan"><span style="font-size:24px">📷</span> Escanear código</button>';
+  h += '<div class="digita">' + entradaManual('dCod', 'dOk') + '</div>';
+  h += '<div id="ultimos"></div>';
+  h += '<div class="titulo">Productos de la lista</div><div style="margin:0 0 8px"><input type="search" id="busca" placeholder="Buscar en la lista" value="' + esc(S.busca) + '"></div><div id="lista"></div>';
+  $('app').innerHTML = h;
+  $('bScan').onclick = abrirEscaner;
+  if (esGerente()) { $('bRepartir').onclick = abrirReparto; $('bCompartir').onclick = compartirEnlace; }
+  ligarManual('dCod', 'dOk');
+  $('busca').oninput = function () { S.busca = this.value; pintarLista(); };
+  pintarUltimos(); pintarLista(); pintarSync();
+  if (esGerente()) {
+    $('barra').style.display = '';
+    $('barra').innerHTML = '<button class="btn ok" id="bCerrar">' + (r2 ? 'Cerrar segundo conteo' : 'Cerrar conteo') + '</button>';
+    $('bCerrar').onclick = confirmarCierre;
+  }
+}
+
+function ultimosHtml() {
+  if (!S.ult.length) return '';
+  return '<div class="ult"><div class="small muted" style="margin-bottom:4px">Últimos códigos leídos</div>' + S.ult.map(function (l) {
+    return '<div class="ul' + (l.ok ? '' : ' mal') + '"><span class="ic" title="' + esc(l.m) + '">' + (METODO[l.m] || '') + '</span><div class="d"><b>' + esc(l.ok ? l.desc : 'No está en la lista') + '</b>' +
+      '<small>' + esc(l.raw) + (l.ok && l.raw !== l.cod ? ' · ' + esc(l.cod) : '') + ' · ' + esc(String(l.m || '').toLowerCase()) + ' · ' + hora(l.t) + '</small></div>' +
+      (l.ok ? '<span class="n">' + esc(l.n) + '</span>' : '') + '</div>';
+  }).join('') + '</div>';
+}
+function pintarUltimos() {
+  if ($('ultimos')) $('ultimos').innerHTML = ultimosHtml();
+  if ($('scUlt')) $('scUlt').innerHTML = ultimosHtml();
+}
+
+function asignado(cod) { return (S.d.asig || {})[cod] || ''; }
+function hayReparto() { return Object.keys(S.d.asig || {}).length > 0; }
+function misHtml() {
+  if (!hayReparto()) return '';
+  var mios = S.d.items.filter(function (i) { return asignado(i.cod) === S.quien; });
+  if (!mios.length) return '<b>No tienes productos asignados.</b> ';
+  var ya = mios.filter(function (i) { return contadoPorAlguien(i.cod); }).length;
+  return '<b>Te tocan ' + mios.length + ' productos; llevas ' + ya + '.</b> ';
+}
+
+function pintarLista() {
+  var its = itemsVisibles();
+  if (!its.length) { $('lista').innerHTML = '<p class="muted small" style="text-align:center">No hay productos con esa búsqueda.</p>'; return; }
+  var pend = its.filter(function (i) { return !contadoPorAlguien(i.cod); }), hechos = its.filter(function (i) { return contadoPorAlguien(i.cod); });
+  var fila = function (i) {
+    var q = miCant(i.cod), a = asignado(i.cod);
+    return '<div class="it"><span class="ck">' + (contadoPorAlguien(i.cod) ? '✓' : '') + '</span><div class="d"><b>' + esc(i.desc) + '</b><small>' + esc(i.cod) +
+      (i.barras.length ? '' : ' · sin código de barras') + (a && a !== S.quien ? ' · le toca a ' + esc(a) : '') +
+      (S.met[i.cod] ? ' · ' + esc(S.met[i.cod].toLowerCase()) : '') + '</small></div><span class="q' + (q != null ? ' si' : '') + '">' + (q != null ? q : '–') + '</span></div>';
+  };
+  var bloque = function (titulo, l) { return l.length ? '<div class="small muted" style="margin:12px 4px 6px">' + titulo + ' (' + l.length + ')</div>' + l.map(fila).join('') : ''; };
+  var h;
+  if (hayReparto()) {
+    h = bloque('Te toca contar', pend.filter(function (i) { return asignado(i.cod) === S.quien; })) +
+      bloque('Les toca a otros', pend.filter(function (i) { return asignado(i.cod) !== S.quien; }));
+  } else h = bloque('Falta contar', pend);
+  $('lista').innerHTML = h + bloque('Ya contados', hechos);
+}
+
+/* ---------- Reparto de la lista (gerente) ---------- */
+function abrirReparto() {
+  var d = S.d, gente = d.personas.slice(), mapa = {}, sel = {};
+  Object.keys(d.asig || {}).forEach(function (c) { mapa[c] = d.asig[c]; sel[d.asig[c]] = true; });
+  if (!hayReparto()) gente.forEach(function (p) { sel[p] = true; });
+  function elegidos() { return gente.filter(function (p) { return sel[p]; }); }
+  function auto() {
+    var g = elegidos(); if (!g.length) return;
+    var its = d.items.slice().sort(function (a, b) { return String(a.grupo).localeCompare(String(b.grupo)) || a.n - b.n; });
+    var tam = Math.ceil(its.length / g.length); mapa = {};
+    its.forEach(function (it, i) { mapa[it.cod] = g[Math.min(g.length - 1, Math.floor(i / tam))]; });
+  }
+  function dibujar() {
+    var g = elegidos(), cuenta = {};
+    d.items.forEach(function (i) { if (mapa[i.cod]) cuenta[mapa[i.cod]] = (cuenta[mapa[i.cod]] || 0) + 1; });
+    var sinAsignar = d.items.filter(function (i) { return !mapa[i.cod]; }).length;
+    var its = d.items.slice().sort(function (a, b) { return String(mapa[a.cod] || '~').localeCompare(String(mapa[b.cod] || '~')) || String(a.grupo).localeCompare(String(b.grupo)) || a.n - b.n; });
+    $('modal').innerHTML = '<div class="modal"><div class="card"><b style="font-size:17px">Repartir la lista</b>' +
+      '<p class="small muted" style="margin:4px 0 10px">Marca quiénes cuentan hoy. Se reparten por categoría para que cada uno recorra su zona; luego puedes cambiar cualquier producto.</p>' +
+      gente.map(function (p, k) {
+        return '<label style="display:flex;align-items:center;gap:10px;padding:7px 2px;border-top:1px solid var(--line)"><input type="checkbox" data-k="' + k + '"' + (sel[p] ? ' checked' : '') + ' style="width:20px;height:20px">' +
+          '<span style="flex:1">' + esc(p) + (p === d.gerente ? ' <span class="small muted">(gerente)</span>' : '') + '</span><span class="small muted">' + (cuenta[p] ? cuenta[p] + ' productos' : '') + '</span></label>';
+      }).join('') +
+      '<button class="btn sec" id="rAuto" style="width:100%;margin:10px 0">Repartir automáticamente</button>' +
+      (sinAsignar && hayAlgo() ? '<div class="aviso warn small">' + sinAsignar + ' producto' + (sinAsignar === 1 ? '' : 's') + ' sin asignar.</div>' : '') +
+      (hayAlgo() ? '<div style="max-height:40vh;overflow:auto;margin-bottom:10px">' + its.map(function (i) {
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)"><div style="flex:1;min-width:0"><b class="small" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(i.desc) + '</b>' +
+          '<span class="small muted">' + esc(i.cod) + ' · ' + esc(i.grupo || '') + '</span></div><select data-c="' + esc(i.cod) + '" style="width:44%;padding:8px">' +
+          '<option value="">Sin asignar</option>' + g.map(function (p) { return '<option' + (mapa[i.cod] === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join('') + '</select></div>';
+      }).join('') + '</div>' : '') +
+      '<div style="display:flex;gap:8px"><button class="btn sec" id="rNo" style="flex:1">Cancelar</button><button class="btn" id="rSi" style="flex:2"' + (hayAlgo() ? '' : ' disabled') + '>Guardar reparto</button></div></div></div>';
+    Array.prototype.forEach.call(document.querySelectorAll('#modal input[type=checkbox]'), function (c) {
+      c.onchange = function () {
+        var p = gente[+c.getAttribute('data-k')]; sel[p] = c.checked;
+        if (!c.checked) Object.keys(mapa).forEach(function (k) { if (mapa[k] === p) delete mapa[k]; });
+        dibujar();
+      };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#modal select[data-c]'), function (s) {
+      s.onchange = function () { var c = s.getAttribute('data-c'); if (s.value) mapa[c] = s.value; else delete mapa[c]; dibujar(); };
+    });
+    $('rAuto').onclick = function () { auto(); dibujar(); };
+    $('rNo').onclick = function () { $('modal').innerHTML = ''; };
+    $('rSi').onclick = function () {
+      this.disabled = true; this.textContent = 'Guardando…';
+      call('apiMueAsignar', TOKEN, S.quien, mapa).then(function (v) {
+        Object.assign(S.d, v); cargarLocal(); $('modal').innerHTML = ''; pintar();
+        toast('Reparto guardado. Cada persona verá lo que le toca al abrir el enlace.', 'ok');
+      }).catch(function (e) { $('modal').innerHTML = ''; error(e); });
+    };
+  }
+  function hayAlgo() { return Object.keys(mapa).length > 0; }
+  if (!hayReparto()) auto();
+  dibujar();
+}
+
+/* ---------- Enlace para el equipo (gerente) ---------- */
+function compartirEnlace() {
+  var url = S.d.enlace;
+  var txt = 'Muestreo Top 50 de ' + S.d.tienda + ': abre este enlace en tu teléfono, elige tu nombre y cuenta los productos que te tocan.';
+  if (navigator.share) {
+    navigator.share({title: 'Muestreo Top 50', text: txt, url: url}).catch(function (e) { if (!e || e.name !== 'AbortError') modalEnlace(txt, url); });
+  } else modalEnlace(txt, url);
+}
+function modalEnlace(txt, url) {
+  $('modal').innerHTML = '<div class="modal"><div class="card"><b style="font-size:17px">Enlace para el equipo</b>' +
+    '<p class="small muted" style="margin:4px 0 10px">Es el mismo enlace de la tienda. Cada persona abre el enlace, elige su nombre y cuenta al mismo tiempo que los demás.</p>' +
+    '<input type="text" id="eUrl" readonly value="' + esc(url) + '">' +
+    '<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:10px;background:#1f9d55" target="_blank" rel="noopener" href="' +
+    'https:\/\/wa.me\/?text=' + encodeURIComponent(txt + ' ' + url) + '">Enviar por WhatsApp</a>' +
+    '<div style="display:flex;gap:8px;margin-top:8px"><button class="btn sec" id="eNo" style="flex:1">Cerrar</button><button class="btn sec" id="eCopiar" style="flex:1">Copiar enlace</button></div></div></div>';
+  $('eNo').onclick = function () { $('modal').innerHTML = ''; };
+  $('eCopiar').onclick = function () {
+    var i = $('eUrl'); i.select(); i.setSelectionRange(0, 9999);
+    var hecho = function () { toast('Enlace copiado', 'ok'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(hecho, function () { try { document.execCommand('copy'); hecho(); } catch (e) {} });
+    else { try { document.execCommand('copy'); hecho(); } catch (e) {} }
+  };
+}
+
+/* Cada minuto trae el reparto y lo que contaron los demás (si no está escaneando ni escribiendo) */
+setInterval(function () {
+  if (!S.d || !S.quien || $('modal').innerHTML || $('scan').className === 'on') return;
+  var a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
+  if (S.d.fase === 'Enviado') return;
+  enviarPendientes().then(function () { return call('apiMueInit', TOKEN); }).then(function (d) {
+    if ($('modal').innerHTML || $('scan').className === 'on') return;
+    S.d = d; cargarLocal(); pintar();
+  }).catch(function () {});
+}, 60000);
+
+function pintarSync() {
+  var el = $('sync'); if (!el) return;
+  var n = hayPendientes();
+  el.className = 'sync' + (n ? ' pend' : '');
+  el.textContent = !n ? '✓ Guardado' : S.sync === 'error' ? 'Sin conexión · se enviará después' : 'Guardando…';
+}
+
+/* Cantidad de un producto leído */
+function abrirCantidad(it, metodo, raw, desdeEscaner) {
+  var q = miCant(it.cod);
+  $('modal').innerHTML = '<div class="modal"><div class="card">' +
+    '<div class="small" style="font-weight:700;color:var(--brand)">' + (METODO[metodo] || '') + ' ' + esc(metodo === 'Digitado' ? 'Código digitado' : 'Leído con la cámara') + ' · ' + esc(raw) + '</div>' +
+    '<b style="font-size:17px;display:block">' + esc(it.desc) + '</b><span class="small muted">' + esc(it.cod) + '</span>' +
+    (asignado(it.cod) && asignado(it.cod) !== S.quien ? '<div class="aviso warn small" style="margin:8px 0 0">Este producto le toca a <b>' + esc(asignado(it.cod)) + '</b>. Si lo cuentas tú también, se suman los dos conteos.</div>' : '') +
+    '<div class="paso"><button id="qMenos">−</button><input id="qN" type="number" inputmode="numeric" min="0" value="' + (q != null ? q : '') + '" placeholder="0"><button id="qMas">+</button></div>' +
+    '<p class="small muted" style="text-align:center;margin:0 0 12px">' + (q != null ? 'Ya tenías ' + q + '. Escribe el total de unidades.' : 'Escribe cuántas unidades hay en total.') + '</p>' +
+    '<div style="display:flex;gap:8px"><button class="btn sec" id="qNo" style="flex:1">Cancelar</button><button class="btn" id="qSi" style="flex:2">Guardar</button></div></div></div>';
+  var inp = $('qN');
+  $('qMenos').onclick = function () { inp.value = Math.max(0, (Number(inp.value) || 0) - 1); };
+  $('qMas').onclick = function () { inp.value = (Number(inp.value) || 0) + 1; };
+  $('qNo').onclick = function () { $('modal').innerHTML = ''; if (desdeEscaner) reanudar(); };
+  $('qSi').onclick = function () {
+    if (inp.value === '') { inp.focus(); return; }
+    fijar(it, inp.value, metodo, raw); $('modal').innerHTML = '';
+    toast('Guardado: ' + it.cod + ' · ' + Math.round(inp.value) + ' u', 'ok');
+    if (desdeEscaner) reanudar(); else pintar();
+  };
+  setTimeout(function () { inp.focus(); inp.select(); }, 50);
+}
+
+/* ---------- Cierre de ronda (gerente) ---------- */
+function confirmarCierre() {
+  var d = S.d, faltan = d.items.filter(function (i) { return !contadoPorAlguien(i.cod); });
+  $('modal').innerHTML = '<div class="modal"><div class="card"><b style="font-size:17px">' + (d.ronda === 2 ? '¿Cerrar el segundo conteo?' : '¿Cerrar el conteo?') + '</b>' +
+    (faltan.length ? '<div class="aviso warn" style="margin:10px 0">Faltan ' + faltan.length + ' producto' + (faltan.length === 1 ? '' : 's') + ' por contar. Si los cierras así, cuentan como <b>0 unidades</b>:<br>' +
+      faltan.slice(0, 8).map(function (i) { return esc(i.cod); }).join(', ') + (faltan.length > 8 ? '…' : '') + '</div>'
+      : '<p class="small muted">Todos los productos tienen conteo.</p>') +
+    '<p class="small muted">' + (d.ronda === 2 ? 'Después de esto vas a ver las diferencias para explicarlas y enviar.'
+      : 'Después de esto la app compara con el sistema. Lo que no cuadre se vuelve a contar.') + '</p>' +
+    '<div style="display:flex;gap:8px"><button class="btn sec" id="cNo" style="flex:1">Seguir contando</button><button class="btn ok" id="cSi" style="flex:1">Cerrar</button></div></div></div>';
+  $('cNo').onclick = function () { $('modal').innerHTML = ''; };
+  $('cSi').onclick = function () {
+    $('cSi').disabled = true; $('cSi').textContent = 'Cerrando…';
+    enviarPendientes().then(function () {
+      if (hayPendientes()) throw new Error('No se pudo guardar todo. Revisa la conexión e intenta de nuevo.');
+      return call('apiMueCerrar', TOKEN, S.quien);
+    }).then(function (r) {
+      $('modal').innerHTML = '';
+      toast(r.reconteo ? r.reconteo + ' producto' + (r.reconteo === 1 ? '' : 's') + ' van a segundo conteo' : 'Conteo cerrado', 'ok');
+      return recargar();
+    }).catch(function (e) { $('modal').innerHTML = ''; error(e); });
+  };
+}
+
+/* ---------- Diferencias y envío ---------- */
+function pintarExplicar() {
+  var d = S.d, difs = d.items.filter(function (i) { return i.estado === 'Diferencia'; });
+  var h = resumenHtml(d.resumen);
+  if (!esGerente()) {
+    $('app').innerHTML = h + '<div class="aviso warn">El conteo ya se cerró. ' + esc(d.gerente) + ' tiene que revisar las diferencias y enviarlas.</div>';
+    return;
+  }
+  h += difs.length ? '<div class="titulo">Explica cada diferencia (' + difs.length + ')</div>' : '<div class="aviso ok">Todo cuadró. Solo falta enviar.</div>';
+  h += difs.map(function (i) {
+    return '<div class="card dif" data-c="' + esc(i.cod) + '"><b>' + esc(i.desc) + '</b><div class="small muted">' + esc(i.cod) + '</div>' +
+      '<div class="small n" style="margin:6px 0 10px">Sistema <b>' + i.teo + '</b> · Contado <b>' + i.c + '</b> · ' +
+      '<b style="color:' + (i.dif < 0 ? 'var(--bad)' : 'var(--warn)') + '">' + (i.dif > 0 ? 'Sobran ' : 'Faltan ') + Math.abs(i.dif) + '</b> (' + dinero(i.difd) + ')</div>' +
+      '<select class="causa"><option value="">Causa…</option>' + d.causas.map(function (c) { return '<option' + (i.causa === c ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>' +
+      '<textarea class="exp" style="margin-top:8px" placeholder="Qué revisaste y qué encontraste (ventas, ingresos, devoluciones, transferencias)">' + esc(i.exp || leerLS('mue.exp.' + TOKEN + '.' + i.cod)) + '</textarea></div>';
+  }).join('');
+  $('app').innerHTML = h;
+  Array.prototype.forEach.call(document.querySelectorAll('.exp'), function (t) {
+    t.oninput = function () { guardarLS('mue.exp.' + TOKEN + '.' + t.parentNode.getAttribute('data-c'), t.value); };
+  });
+  $('barra').style.display = '';
+  $('barra').innerHTML = '<button class="btn ok" id="bEnviar">Enviar a Diego y supervisores</button>';
+  $('bEnviar').onclick = function () {
+    var lista = [], falta = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('.card.dif'), function (c) {
+      var x = {cod: c.getAttribute('data-c'), causa: c.querySelector('.causa').value, exp: c.querySelector('.exp').value.trim()};
+      if (!x.causa || x.exp.length < 5) { falta++; c.style.boxShadow = '0 0 0 2px var(--bad)'; } else c.style.boxShadow = '';
+      lista.push(x);
+    });
+    if (falta) { toast('Falta la causa o la explicación de ' + falta + ' producto' + (falta === 1 ? '' : 's'), 'mal'); return; }
+    var b = this; b.disabled = true; b.textContent = 'Enviando…';
+    call('apiMueEnviar', TOKEN, S.quien, lista).then(function () { toast('Enviado', 'ok'); return recargar(); })
+      .catch(function (e) { b.disabled = false; b.textContent = 'Enviar a Diego y supervisores'; error(e); });
+  };
+}
+
+function resumenHtml(r) {
+  if (!r) return '';
+  return '<div class="card"><b>Resultado</b><div class="res3"><div><b>' + r.exactitud + '%</b><span>exactitud (' + r.ok + ' de ' + r.total + ')</span></div>' +
+    '<div><b style="color:var(--bad)">' + dinero(r.faltante) + '</b><span>faltante al costo</span></div>' +
+    '<div><b>' + dinero(r.sobrante) + '</b><span>sobrante al costo</span></div></div></div>';
+}
+
+function pintarEnviado() {
+  var d = S.d, difs = d.items.filter(function (i) { return i.estado === 'Diferencia'; });
+  $('app').innerHTML = '<div class="aviso ok"><b>Enviado.</b> Diego y los supervisores ya tienen el resultado de esta semana.</div>' + resumenHtml(d.resumen) +
+    (difs.length ? '<div class="titulo">Diferencias enviadas</div>' + difs.map(function (i) {
+      return '<div class="card dif"><b>' + esc(i.desc) + '</b><div class="small muted">' + esc(i.cod) + ' · sistema ' + i.teo + ' · contado ' + i.c + ' · ' + dinero(i.difd) + '</div>' +
+        '<div class="small" style="margin-top:6px"><b>' + esc(i.causa) + ':</b> ' + esc(i.exp) + '</div></div>';
+    }).join('') : '');
+}
+
+/* ---------- Escáner ---------- */
+/* La cámara se pide una sola vez por sesión: al cerrar el escáner solo se apaga la imagen (no se suelta la cámara),
+   así al volver a abrirlo no sale otra vez el permiso. Si el navegador no deja usar la cámara en vivo, se recuerda
+   y se va directo a la foto del código, que no pide permiso. */
+var CAM = {stream: null, corriendo: false, pausa: false, ultimo: '', ultimoT: 0, luz: false, vuelta: 0, soloFoto: leerLS('mue.soloFoto') === '1'};
+var DET = null;
+
+function cargarScript(src) {
+  return new Promise(function (ok, ko) {
+    var s = document.createElement('script'); s.src = src; s.onload = ok;
+    s.onerror = function () { ko(new Error('No se pudo cargar el lector de códigos. Revisa la conexión.')); };
+    document.head.appendChild(s);
+  });
+}
+
+/* Usa el lector del teléfono si existe (Android); si no, el de ZXing (iPhone) */
+function detector() {
+  if (DET) return Promise.resolve(DET);
+  var nativo = ('BarcodeDetector' in window && window.BarcodeDetector.getSupportedFormats)
+    ? window.BarcodeDetector.getSupportedFormats().then(function (f) {
+        return f.indexOf('ean_13') >= 0 ? new window.BarcodeDetector({formats: FORMATOS.filter(function (x) { return f.indexOf(x) >= 0; })}) : null;
+      }).catch(function () { return null; })
+    : Promise.resolve(null);
+  return nativo.then(function (d) {
+    if (d) return d;
+    return (window.BarcodeDetectionAPI ? Promise.resolve() : cargarScript(BD_URL)).then(function () {
+      return new window.BarcodeDetectionAPI.BarcodeDetector({formats: FORMATOS});
+    });
+  }).then(function (d) { DET = d; return d; });
+}
+
+function normBarras(s) { return String(s || '').replace(/\s/g, '').replace(/^0+/, '').toUpperCase(); }
+function buscarCodigo(raw) {
+  var b = normBarras(raw);
+  if (!b) return null;
+  return S.d.items.filter(function (i) {
+    return i.barras.some(function (x) { return normBarras(x) === b; }) || i.cod.toUpperCase() === String(raw).trim().toUpperCase();
+  })[0] || null;
+}
+
+var AUDIO = null;
+function sonar(ok) {
+  try {
+    AUDIO = AUDIO || new (window.AudioContext || window.webkitAudioContext)();
+    var o = AUDIO.createOscillator(), g = AUDIO.createGain();
+    o.frequency.value = ok ? 1250 : 220; o.type = ok ? 'sine' : 'square';
+    g.gain.value = 0.15; o.connect(g); g.connect(AUDIO.destination);
+    o.start(); o.stop(AUDIO.currentTime + (ok ? 0.12 : 0.35));
+  } catch (e) {}
+  try { if (navigator.vibrate) navigator.vibrate(ok ? 60 : [80, 60, 80]); } catch (e) {}
+}
+
+function abrirEscaner() {
+  try { AUDIO = AUDIO || new (window.AudioContext || window.webkitAudioContext)(); if (AUDIO.resume) AUDIO.resume(); } catch (e) {}
+  $('scan').className = 'on';
+  if (CAM.soloFoto) { sinCamara(null); return; }
+  $('marco').style.display = '';
+  CAM.pausa = false;
+  pintarPanel();
+  Promise.all([pedirCamara(), detector()]).then(function (r) {
+    var v = $('video');
+    if (v.srcObject !== r[0]) { v.setAttribute('playsinline', ''); v.muted = true; v.srcObject = r[0]; }
+    return v.play().then(function () {
+      var tr = r[0].getVideoTracks()[0];
+      try { tr.applyConstraints({advanced: [{focusMode: 'continuous'}]}).catch(function () {}); } catch (e) {}
+      var cap = tr.getCapabilities ? tr.getCapabilities() : {};
+      $('scLuz').style.display = cap && cap.torch ? '' : 'none';
+      CAM.ultimo = ''; CAM.corriendo = true; bucle();
+    });
+  }).catch(function (e) {
+    if (bloqueoDelSitio(e)) { CAM.soloFoto = true; guardarLS('mue.soloFoto', '1'); }
+    sinCamara(e);
+  });
+}
+
+/* Reutiliza la cámara ya autorizada; solo la pide si no hay una abierta */
+function pedirCamara() {
+  var s = CAM.stream;
+  if (s && s.getVideoTracks().some(function (t) { return t.readyState === 'live'; })) {
+    s.getVideoTracks().forEach(function (t) { t.enabled = true; });
+    return Promise.resolve(s);
+  }
+  if (!camaraPermitidaEnPagina()) return Promise.reject(Object.assign(new Error('camera not allowed in this document'), {name: 'NotAllowedError', politica: true}));
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return Promise.reject(new Error('sin cámara'));
+  return navigator.mediaDevices.getUserMedia({audio: false, video: {facingMode: {ideal: 'environment'}, width: {ideal: 1280}, height: {ideal: 720}}})
+    .then(function (st) { CAM.stream = st; return st; });
+}
+/* Chrome dice de antemano si la página puede usar la cámara (Apps Script a veces no lo permite) */
+function camaraPermitidaEnPagina() {
+  try { var fp = document.permissionsPolicy || document.featurePolicy; if (fp && fp.allowsFeature) return fp.allowsFeature('camera'); } catch (e) {}
+  return true;
+}
+function bloqueoDelSitio(e) { return !!(e && (e.politica || /document|policy|insecure|secure context/i.test(e.message || ''))); }
+
+/* Si el navegador no deja usar la cámara en vivo: foto del código o digitarlo */
+function sinCamara(e) {
+  cerrarCamara(true);
+  $('marco').style.display = 'none';
+  $('scAyuda').textContent = '';
+  var negado = e && !bloqueoDelSitio(e) && /denied|permission|NotAllowed/i.test(e.name + e.message);
+  $('scPanel').innerHTML = (CAM.soloFoto
+      ? '<b>Toma una foto del código de barras</b><p class="small muted" style="margin:4px 0 12px">En este teléfono la cámara en vivo no está disponible; la foto lee el código igual.</p>'
+      : '<b>No se pudo abrir la cámara en vivo</b><p class="small muted" style="margin:4px 0 12px">' +
+        (negado ? 'No se dio permiso a la cámara. Puedes tomar una foto del código o volver a intentar.' : 'Toma una foto del código de barras o digítalo.') + '</p>') +
+    '<button class="btn grande" id="bFoto">📸 Tomar foto del código</button>' + entradaManual('mCod', 'mOk') + '<div id="scUlt"></div>' +
+    '<button class="btn sec" id="bVivo" style="width:100%;margin-top:10px;font-size:14px">Intentar cámara en vivo</button>';
+  $('bFoto').onclick = function () { $('foto').value = ''; $('foto').click(); };
+  $('bVivo').onclick = function () { CAM.soloFoto = false; guardarLS('mue.soloFoto', ''); abrirEscaner(); };
+  ligarManual('mCod', 'mOk', true);
+  pintarUltimos();
+}
+
+$('foto').onchange = function () {
+  var f = this.files && this.files[0]; if (!f) return;
+  toast('Leyendo la foto…');
+  detector().then(function (d) {
+    return (window.createImageBitmap ? createImageBitmap(f) : Promise.resolve(f)).then(function (img) { return leerFoto(d, img); });
+  }).then(function (r) {
+    if (!r.length) { sonar(false); toast('No encontré un código en la foto. Acércate más y que no salga borroso, o digita el código.', 'mal'); return; }
+    leido(r[0].rawValue, 'Foto');
+  }).catch(function () { sonar(false); toast('No se pudo leer la foto en este teléfono. Digita el código en el campo de abajo.', 'mal'); });
+};
+
+/* Una foto de cámara es grande: si no sale a la primera, prueba más pequeña y luego el centro de la foto */
+function leerFoto(d, img) {
+  var w = img.width, h = img.height;
+  var intentos = [function () { return img; }];
+  [1600, 1000].forEach(function (max) {
+    intentos.push(function () { var k = Math.min(1, max / Math.max(w, h)); return recorte(img, 0, 0, w, h, k); });
+  });
+  intentos.push(function () { return recorte(img, w * 0.15, h * 0.25, w * 0.7, h * 0.5, Math.min(1, 1400 / (w * 0.7))); });
+  var i = 0;
+  function sig() {
+    if (i >= intentos.length) return Promise.resolve([]);
+    var src = intentos[i++]();
+    return d.detect(src).catch(function () { return []; }).then(function (r) { return r && r.length ? r : sig(); });
+  }
+  return sig();
+}
+function recorte(img, x, y, w, h, k) {
+  var c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  c.getContext('2d').drawImage(img, x, y, w, h, 0, 0, c.width, c.height);
+  return c;
+}
+
+function entradaManual(idIn, idOk) {
+  return '<div style="display:flex;gap:8px;margin-top:10px"><input type="text" id="' + idIn + '" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="⌨️ Digitar código de barras o código Steren">' +
+    '<button class="btn sec" id="' + idOk + '">OK</button></div>';
+}
+function ligarManual(idIn, idOk, enEscaner) {
+  $(idOk).onclick = function () {
+    var v = $(idIn).value.trim(); if (!v) return;
+    $(idIn).value = ''; $(idIn).blur();
+    leido(v, 'Digitado', enEscaner);
+  };
+  $(idIn).onkeydown = function (e) { if (e.key === 'Enter') $(idOk).click(); };
+}
+
+function pintarPanel() {
+  $('scAyuda').textContent = 'Apunta al código de barras';
+  $('scPanel').innerHTML = '<div class="seg" style="margin-bottom:8px"><button data-m="cantidad" class="' + (S.modo === 'cantidad' ? 'on' : '') + '">Escanear y escribir cantidad</button>' +
+    '<button data-m="uno" class="' + (S.modo === 'uno' ? 'on' : '') + '">Sumar 1 por escaneo</button></div>' +
+    '<div id="scUlt"></div>' + entradaManual('mCod', 'mOk');
+  Array.prototype.forEach.call(document.querySelectorAll('#scPanel .seg button'), function (b) {
+    b.onclick = function () { S.modo = b.getAttribute('data-m'); pintarPanel(); };
+  });
+  ligarManual('mCod', 'mOk', true);
+  pintarUltimos();
+}
+
+/* Lee solo la zona del marco: es más rápido, sobre todo en iPhone (ZXing) */
+var ROI = document.createElement('canvas');
+function zonaMarco(v) {
+  if (DET && !window.BarcodeDetectionAPI) return v;
+  var vw = v.videoWidth, vh = v.videoHeight, cw = v.clientWidth, ch = v.clientHeight;
+  if (!vw || !vh || !cw || !ch) return v;
+  var k = Math.max(cw / vw, ch / vh), ox = (vw * k - cw) / 2, oy = (vh * k - ch) / 2;
+  /* todo el ancho del video y una franja alrededor del marco; cada 4 vueltas se lee la imagen completa */
+  if (++CAM.vuelta % 4 === 0) return v;
+  var x = 0, w = vw, y = Math.max(0, (ch * 0.16 + oy) / k), h = Math.min(vh - y, ch * 0.46 / k);
+  var e = Math.min(1, 960 / w);
+  ROI.width = Math.round(w * e); ROI.height = Math.round(h * e);
+  ROI.getContext('2d', {willReadFrequently: true}).drawImage(v, x, y, w, h, 0, 0, ROI.width, ROI.height);
+  return ROI;
+}
+
+function bucle() {
+  if (!CAM.corriendo) return;
+  var v = $('video');
+  if (CAM.pausa || v.readyState < 2) { setTimeout(bucle, 150); return; }
+  var img;
+  try { img = zonaMarco(v); } catch (e) { img = v; }
+  DET.detect(img).then(function (r) {
+    if (r && r.length && !CAM.pausa && CAM.corriendo) leido(r[0].rawValue, 'Cámara', true);
+  }).catch(function () {}).then(function () { setTimeout(bucle, 60); });
+}
+
+/* Un código leído (cámara, foto o digitado). enEscaner: la pantalla de la cámara está abierta */
+function leido(raw, metodo, enEscaner) {
+  var ahora = Date.now();
+  if (metodo === 'Cámara' && raw === CAM.ultimo && ahora - CAM.ultimoT < 1500) return;
+  CAM.ultimo = raw; CAM.ultimoT = ahora;
+  var it = buscarCodigo(raw), m = $('marco');
+  if (!it) {
+    sonar(false); m.className = 'marco mal';
+    toast('Este código no está en la lista de esta semana (' + raw + ')', 'mal');
+    setTimeout(function () { m.className = 'marco'; }, 900);
+    anotar(raw, null, metodo, '');
+    return;
+  }
+  sonar(true); m.className = 'marco ok'; setTimeout(function () { m.className = 'marco'; }, 600);
+  if (S.modo === 'uno' && metodo === 'Cámara') {
+    var n = (miCant(it.cod) || 0) + 1;
+    fijar(it, n, metodo, raw); toast('+1 · ' + it.desc + ' (' + n + ')', 'ok');
+  } else {
+    CAM.pausa = true; abrirCantidad(it, metodo, raw, enEscaner && CAM.corriendo);
+  }
+}
+
+function reanudar() { CAM.pausa = false; CAM.ultimoT = Date.now() + 3500; }
+
+/* soltar=true libera la cámara (al salir de la página); si no, solo se apaga la imagen y el permiso sigue vigente */
+function cerrarCamara(soltar) {
+  CAM.corriendo = false;
+  if (CAM.luz && CAM.stream) { try { CAM.stream.getVideoTracks()[0].applyConstraints({advanced: [{torch: false}]}).catch(function () {}); } catch (e) {} }
+  CAM.luz = false;
+  if (!CAM.stream) return;
+  if (soltar) { CAM.stream.getTracks().forEach(function (t) { t.stop(); }); CAM.stream = null; $('video').srcObject = null; }
+  else { CAM.stream.getVideoTracks().forEach(function (t) { t.enabled = false; }); try { $('video').pause(); } catch (e) {} }
+}
+window.addEventListener('pagehide', function () { cerrarCamara(true); });
+
+$('scCerrar').onclick = function () { cerrarCamara(); $('scan').className = ''; $('modal').innerHTML = ''; pintar(); };
+$('scLuz').onclick = function () {
+  if (!CAM.stream) return;
+  CAM.luz = !CAM.luz;
+  CAM.stream.getVideoTracks()[0].applyConstraints({advanced: [{torch: CAM.luz}]}).catch(function () {});
+};
+$('quienBtn').onclick = function () {
+  enviarPendientes().then(function () { S.quien = ''; guardarLS('mue.quien.' + TOKEN, ''); pintar(); });
+};
+
+iniciar();
+</script>
+</body>
+</html>
