@@ -319,7 +319,7 @@ function pintarLista() {
   var pend = its.filter(function (i) { return !contadoPorAlguien(i.cod); }), hechos = its.filter(function (i) { return contadoPorAlguien(i.cod); });
   var fila = function (i) {
     var q = miCant(i.cod), a = asignado(i.cod);
-    return '<div class="it"><span class="ck">' + (contadoPorAlguien(i.cod) ? '✓' : '') + '</span><div class="d"><b>' + esc(i.desc) + '</b><small>' + esc(i.cod) +
+    return '<div class="it" data-c="' + esc(i.cod) + '"><span class="ck">' + (contadoPorAlguien(i.cod) ? '✓' : '') + '</span><div class="d"><b>' + esc(i.desc) + '</b><small>' + esc(i.cod) +
       (i.barras.length ? '' : ' · sin código de barras') + (a && a !== S.quien ? ' · le toca a ' + esc(a) : '') +
       (S.met[i.cod] ? ' · ' + esc(S.met[i.cod].toLowerCase()) : '') + '</small></div><span class="q' + (q != null ? ' si' : '') + '">' + (q != null ? q : '–') + '</span></div>';
   };
@@ -330,6 +330,13 @@ function pintarLista() {
       bloque('Les toca a otros', pend.filter(function (i) { return asignado(i.cod) !== S.quien; }));
   } else h = bloque('Falta contar', pend);
   $('lista').innerHTML = h + bloque('Ya contados', hechos);
+  /* Tocar un producto abre su cantidad (sirve para registrar 0 lo que no hay en la tienda) */
+  Array.prototype.forEach.call(document.querySelectorAll('#lista .it'), function (el) {
+    el.onclick = function () {
+      var c = el.getAttribute('data-c'), it = S.d.items.filter(function (x) { return x.cod === c; })[0];
+      if (it) abrirCantidad(it, 'Digitado', it.cod, false);
+    };
+  });
 }
 
 /* ---------- Reparto de la lista (gerente) ---------- */
@@ -438,14 +445,14 @@ function abrirCantidad(it, metodo, raw, desdeEscaner) {
     '<b style="font-size:17px;display:block">' + esc(it.desc) + '</b><span class="small muted">' + esc(it.cod) + '</span>' +
     (asignado(it.cod) && asignado(it.cod) !== S.quien ? '<div class="aviso warn small" style="margin:8px 0 0">Este producto le toca a <b>' + esc(asignado(it.cod)) + '</b>. Si lo cuentas tú también, se suman los dos conteos.</div>' : '') +
     '<div class="paso"><button id="qMenos">−</button><input id="qN" type="number" inputmode="numeric" min="0" value="' + (q != null ? q : '') + '" placeholder="0"><button id="qMas">+</button></div>' +
-    '<p class="small muted" style="text-align:center;margin:0 0 12px">' + (q != null ? 'Ya tenías ' + q + '. Escribe el total de unidades.' : 'Escribe cuántas unidades hay en total.') + '</p>' +
+    '<p class="small muted" style="text-align:center;margin:0 0 12px">' + (q != null ? 'Ya tenías ' + q + '. Escribe el total de unidades.' : 'Escribe cuántas unidades hay en total. Si no hay ninguna, deja 0 y presiona Guardar.') + '</p>' +
     '<div style="display:flex;gap:8px"><button class="btn sec" id="qNo" style="flex:1">Cancelar</button><button class="btn" id="qSi" style="flex:2">Guardar</button></div></div></div>';
   var inp = $('qN');
   $('qMenos').onclick = function () { inp.value = Math.max(0, (Number(inp.value) || 0) - 1); };
   $('qMas').onclick = function () { inp.value = (Number(inp.value) || 0) + 1; };
   $('qNo').onclick = function () { $('modal').innerHTML = ''; if (desdeEscaner) reanudar(); };
   $('qSi').onclick = function () {
-    if (inp.value === '') { inp.focus(); return; }
+    if (inp.value === '') inp.value = 0;
     fijar(it, inp.value, metodo, raw); $('modal').innerHTML = '';
     toast('Guardado: ' + it.cod + ' · ' + Math.round(inp.value) + ' u', 'ok');
     if (desdeEscaner) reanudar(); else pintar();
