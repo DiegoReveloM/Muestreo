@@ -623,7 +623,7 @@ function pintarEnviado() {
 /* La cámara se pide una sola vez por sesión: al cerrar el escáner solo se apaga la imagen (no se suelta la cámara),
    así al volver a abrirlo no sale otra vez el permiso. Si el navegador no deja usar la cámara en vivo, se recuerda
    y se va directo a la foto del código, que no pide permiso. */
-var CAM = {stream: null, corriendo: false, pausa: false, ultimo: '', ultimoT: 0, luz: false, vuelta: 0, soloFoto: leerLS('mue.soloFoto') === '1'};
+var CAM = {stream: null, corriendo: false, pausa: false, ultimo: '', ultimoT: 0, gen: 0, visto: '', vistoT: 0, vistoN: 0, luz: false, vuelta: 0, soloFoto: leerLS('mue.soloFoto') === '1'};
 var DET = null;
 
 function cargarScript(src) {
@@ -686,7 +686,7 @@ function abrirEscaner() {
       try { tr.applyConstraints({advanced: [{focusMode: 'continuous'}]}).catch(function () {}); } catch (e) {}
       var cap = tr.getCapabilities ? tr.getCapabilities() : {};
       $('scLuz').style.display = cap && cap.torch ? '' : 'none';
-      CAM.ultimo = ''; CAM.corriendo = true; bucle();
+      CAM.ultimo = ''; CAM.visto = ''; CAM.corriendo = true; bucle(++CAM.gen);
     });
   }).catch(function (e) {
     if (bloqueoDelSitio(e)) { CAM.soloFoto = true; guardarLS('mue.soloFoto', '1'); }
@@ -806,21 +806,32 @@ function zonaMarco(v) {
   return ROI;
 }
 
-function bucle() {
-  if (!CAM.corriendo) return;
+/* gen: cada vez que se abre la cámara empieza una vuelta nueva y la anterior se detiene (si no, se acumulan y el escaneo se pone lento) */
+function bucle(gen) {
+  if (!CAM.corriendo || gen !== CAM.gen) return;
   var v = $('video');
-  if (CAM.pausa || v.readyState < 2) { setTimeout(bucle, 150); return; }
+  if (CAM.pausa || v.readyState < 2) { CAM.visto = ''; setTimeout(function () { bucle(gen); }, 150); return; }
   var img;
   try { img = zonaMarco(v); } catch (e) { img = v; }
   DET.detect(img).then(function (r) {
-    if (r && r.length && !CAM.pausa && CAM.corriendo) leido(r[0].rawValue, 'Cámara', true);
-  }).catch(function () {}).then(function () { setTimeout(bucle, 60); });
+    if (gen !== CAM.gen) return;
+    if (r && r.length && !CAM.pausa && CAM.corriendo) visto(r[0].rawValue);
+  }).catch(function () {}).then(function () { setTimeout(function () { bucle(gen); }, 60); });
+}
+
+/* Un código cuenta cuando se lee igual 2 veces seguidas (evita lecturas falsas) y solo una vez mientras siga frente a la cámara:
+   para volver a contarlo hay que retirarlo un momento (en "Sumar 1 por escaneo" ya no suma solo si la cámara se queda quieta) */
+function visto(raw) {
+  var ahora = Date.now();
+  if (raw === CAM.visto && ahora - CAM.vistoT < 700) CAM.vistoN++;
+  else { CAM.visto = raw; CAM.vistoN = 1; }
+  CAM.vistoT = ahora;
+  if (CAM.vistoN === 2) leido(raw, 'Cámara', true);
 }
 
 /* Un código leído (cámara, foto o digitado). enEscaner: la pantalla de la cámara está abierta */
 function leido(raw, metodo, enEscaner) {
   var ahora = Date.now();
-  if (metodo === 'Cámara' && raw === CAM.ultimo && ahora - CAM.ultimoT < 1500) return;
   CAM.ultimo = raw; CAM.ultimoT = ahora;
   var it = buscarCodigo(raw), m = $('marco');
   if (!it) {
@@ -839,7 +850,8 @@ function leido(raw, metodo, enEscaner) {
   }
 }
 
-function reanudar() { CAM.pausa = false; CAM.ultimoT = Date.now() + 3500; }
+/* Al volver a la cámara, el producto recién guardado no se vuelve a abrir mientras siga frente a ella */
+function reanudar() { CAM.pausa = false; CAM.visto = CAM.ultimo; CAM.vistoN = 99; CAM.vistoT = Date.now(); }
 
 /* soltar=true libera la cámara (al salir de la página); si no, solo se apaga la imagen y el permiso sigue vigente */
 function cerrarCamara(soltar) {
