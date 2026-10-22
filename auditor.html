@@ -86,7 +86,7 @@ function totales(inv) {
   var t = {n: inv.items.length, F: {n: 0, u: 0, c: 0, p: 0}, S: {n: 0, u: 0, c: 0, p: 0}, C: {n: 0, u: 0, c: 0, p: 0}, desc: 0, sis: 0, fis: 0};
   inv.items.forEach(function (i) {
     var k = {Faltante: 'F', Sobrante: 'S', Cruce: 'C'}[tipoDe(i)];
-    t.sis += i.sis; t.fis += i.fis;
+    if (i.sis != null) { t.conSis = true; t.sis += i.sis; t.fis += i.fis || 0; }
     if (k) { var g = t[k]; g.n++; g.u += i.dif; g.c += i.dif * i.costo; g.p += i.dif * i.pvp; }
     if (i.cobra && i.dif < 0) t.desc += -i.dif * i.pvp;
   });
@@ -141,7 +141,7 @@ function abrir(inv) {
   var t = totales(inv);
   app.innerHTML = (S.d.inventarios.length > 1 ? '<div class="acciones volver"><button class="btn sec" id="volver">‹ Todos los inventarios</button></div>' : '') +
     '<div class="card"><div class="small muted">Inventario cerrado</div><b style="font-size:20px">' + esc(inv.tienda) + ' · ' + fecha(inv.fecha) + '</b>' +
-    '<div class="small muted">' + t.n + ' productos con diferencia o revisados · sistema ' + t.sis + ' u · físico ' + t.fis + ' u</div></div>' +
+    '<div class="small muted">' + t.n + ' productos con diferencia' + (t.conSis ? ' · sistema ' + t.sis + ' u · físico ' + t.fis + ' u' : '') + '</div></div>' +
     '<div class="kpis">' +
       kpi('f', 'Faltantes', t.F) + kpi('s', 'Sobrantes', t.S) +
       kpi('c', 'Cruces (un producto por otro)', t.C) +
@@ -177,18 +177,19 @@ function tabla() {
   }).join('');
   ch.querySelectorAll('button').forEach(function (b) { b.onclick = function () { S.filtro = b.getAttribute('data-f'); tabla(); }; });
   var v = visibles(), sc = 0, sp = 0, sd = 0;
+  var cs = S.inv.items.some(function (i) { return i.sis != null; });   /* algunos inventarios solo traen la diferencia */
   var filas = v.map(function (i) {
     var dc = i.dif * i.costo, dp = i.dif * i.pvp, cl = i.dif < 0 ? 'neg' : i.dif > 0 ? 'pos' : '';
     sc += dc; sp += dp; if (i.cobra && i.dif < 0) sd += -dp;
     return '<tr><td class="cod">' + esc(i.cod) + '</td><td class="t">' + esc(i.desc) + (i.nota ? '<div class="small muted">' + esc(i.nota) + '</div>' : '') + '</td>' +
-      '<td>' + i.sis + '</td><td>' + i.fis + '</td><td class="' + cl + '"><b>' + uni(i.dif) + '</b></td>' +
+      (cs ? '<td>' + (i.sis == null ? '—' : i.sis) + '</td><td>' + (i.fis == null ? '—' : i.fis) + '</td>' : '') + '<td class="' + cl + '"><b>' + uni(i.dif) + '</b></td>' +
       '<td>' + din(i.costo) + '</td><td>' + din(i.pvp) + '</td><td class="' + cl + '">' + din(dc) + '</td><td class="' + cl + '">' + din(dp) + '</td>' +
       '<td style="text-align:left"><span class="tag ' + tipoDe(i) + '">' + tipoDe(i) + '</span></td><td>' + (i.cobra && i.dif < 0 ? 'Sí' : 'No') + '</td></tr>';
   }).join('');
-  document.getElementById('tabla').innerHTML = '<table><thead><tr><th class="cod">Código</th><th class="t">Descripción</th><th>Sistema</th><th>Físico</th><th>Dif.</th>' +
+  document.getElementById('tabla').innerHTML = '<table><thead><tr><th class="cod">Código</th><th class="t">Descripción</th>' + (cs ? '<th>Sistema</th><th>Físico</th>' : '') + '<th>Dif.</th>' +
     '<th>Costo u.</th><th>PVP u.</th><th>Dif. costo</th><th>Dif. PVP</th><th style="text-align:left">Tipo</th><th>Se descuenta</th></tr></thead><tbody>' +
-    (filas || '<tr><td colspan="11" class="t muted">Sin resultados</td></tr>') + '</tbody>' +
-    '<tfoot><tr><td class="cod" colspan="7">' + v.length + ' productos</td><td>' + din(sc) + '</td><td>' + din(sp) + '</td><td></td><td>' + din(sd) + '</td></tr></tfoot></table>';
+    (filas || '<tr><td colspan="' + (cs ? 11 : 9) + '" class="t muted">Sin resultados</td></tr>') + '</tbody>' +
+    '<tfoot><tr><td class="cod" colspan="' + (cs ? 7 : 5) + '">' + v.length + ' productos</td><td>' + din(sc) + '</td><td>' + din(sp) + '</td><td></td><td>' + din(sd) + '</td></tr></tfoot></table>';
 }
 
 function csv(inv) {
@@ -196,7 +197,7 @@ function csv(inv) {
   var n = function (x) { return (Number(x) || 0).toFixed(2).replace('.', ','); };
   var out = [['Tienda', 'Fecha', 'Código', 'Descripción', 'Sistema', 'Físico', 'Diferencia', 'Costo unitario', 'PVP unitario', 'Dif. costo', 'Dif. PVP', 'Tipo', 'Se descuenta', 'Nota'].join(';')];
   inv.items.forEach(function (i) {
-    out.push([inv.tienda, inv.fecha, i.cod, i.desc, i.sis, i.fis, i.dif, n(i.costo), n(i.pvp), n(i.dif * i.costo), n(i.dif * i.pvp), tipoDe(i), i.cobra && i.dif < 0 ? 'Sí' : 'No', i.nota].map(c).join(';'));
+    out.push([inv.tienda, inv.fecha, i.cod, i.desc, i.sis == null ? '' : i.sis, i.fis == null ? '' : i.fis, i.dif, n(i.costo), n(i.pvp), n(i.dif * i.costo), n(i.dif * i.pvp), tipoDe(i), i.cobra && i.dif < 0 ? 'Sí' : 'No', i.nota].map(c).join(';'));
   });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['﻿' + out.join('\r\n')], {type: 'text/csv;charset=utf-8'}));
