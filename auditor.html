@@ -17,43 +17,56 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
 button,input{font:inherit;color:inherit}
-header{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+header{background:var(--brand);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
 header h1{font-size:18px;margin:0;font-weight:700}
 header .sub{font-size:13px;opacity:.85}
-main{max-width:1000px;margin:0 auto;padding:12px 16px 60px}
+main{max-width:1100px;margin:0 auto;padding:12px 16px 60px}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
 .muted{color:var(--muted)} .small{font-size:13px}
 .btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
 .btn.sec{background:var(--brand-soft);color:var(--brand)}
 input[type=search],input[type=password]{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}
-.titulo{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:16px 2px 6px}
+h2{font-size:17px;margin:26px 2px 8px;scroll-margin-top:64px}
+h2 small{font-weight:400;color:var(--muted);font-size:13px}
 .aviso{padding:12px 14px;border-radius:10px;margin-bottom:10px;font-size:14px}
 .aviso.bad{background:var(--bad-soft);color:var(--bad)} .aviso.warn{background:var(--warn-soft);color:var(--warn)}
-.inv{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
-.inv b{font-size:16px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:8px 0}
+.toma{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.toma b{font-size:16px}
+.nav{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--brand);text-decoration:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:8px 0}
 .kpi{background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;border-left:4px solid var(--line)}
 .kpi.f{border-left-color:var(--bad)} .kpi.s{border-left-color:var(--ok)} .kpi.c{border-left-color:var(--warn)} .kpi.d{border-left-color:var(--brand);background:var(--brand-soft)}
 .kpi span{font-size:12px;color:var(--muted);display:block}
-.kpi b{font-size:20px;font-variant-numeric:tabular-nums}
+.kpi b{font-size:19px;font-variant-numeric:tabular-nums}
 .kpi small{display:block;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
 .chips button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
-.tabla{overflow-x:auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
+.tabla{overflow-x:auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);max-height:70vh;overflow-y:auto}
 table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th{background:#f8fafc;font-size:12px;color:var(--muted);position:sticky;top:0}
-td.t,th.t{text-align:left;white-space:normal;min-width:180px}
-td.cod,th.cod{text-align:left}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:top}
+th{background:#f8fafc;font-size:12px;color:var(--muted);position:sticky;top:0;z-index:1}
+.l{text-align:left}
+td.t{text-align:left;white-space:normal;min-width:190px}
 tfoot td{font-weight:700;background:#f8fafc}
 .neg{color:var(--bad)} .pos{color:var(--ok)}
-.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px}
-.tag.Faltante{background:var(--bad-soft);color:var(--bad)} .tag.Sobrante{background:var(--ok-soft);color:var(--ok)} .tag.Cruce{background:var(--warn-soft);color:var(--warn)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--line);color:var(--muted)}
+.tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.info{background:var(--brand-soft);color:var(--brand)}
+.crono{list-style:none;margin:0;padding:0}
+.crono li{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.crono li:last-child{border-bottom:0}
+.crono time{flex:none;width:118px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pers{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.pers .card{margin:0}
+.pers dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0 0;font-size:13px}
+.pers dt{color:var(--muted)} .pers dd{margin:0;font-variant-numeric:tabular-nums}
+.eq{font-size:12px;background:var(--bg);border-radius:8px;padding:6px 8px;margin-top:6px}
 .acciones{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.nota{font-size:12px;color:var(--muted);margin-top:10px}
-@media (max-width:600px){main{padding:10px 12px 50px}.kpis{grid-template-columns:1fr 1fr}.kpi b{font-size:17px}}
-@media print{header,.acciones,.chips,#buscar,.volver{display:none!important}body{background:#fff}.card,.kpi,.tabla{box-shadow:none;border:1px solid var(--line)}th{position:static}main{max-width:none;padding:0}}
+.nota{font-size:12px;color:var(--muted);margin-top:8px}
+@media (max-width:600px){main{padding:10px 12px 50px}.kpis{grid-template-columns:1fr 1fr}.kpi b{font-size:16px}.crono time{width:96px}.pers{grid-template-columns:1fr}}
+@media print{header,.acciones,.chips,.nav,input[type=search],.volver{display:none!important}body{background:#fff}.card,.kpi,.tabla{box-shadow:none;border:1px solid var(--line)}.tabla{max-height:none;overflow:visible}th{position:static}main{max-width:none;padding:0}}
 </style>
 </head>
 <body>
@@ -65,7 +78,8 @@ tfoot td{font-weight:700;background:#f8fafc}
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxvxIW9iw7D6IyKTMx5Xyj9BW4d_u7G4BMVwRzaI9ug1MIB1tdfVCAWhu2iIWjbz0lgMA/exec';
 var CLAVE = new URLSearchParams(location.search).get('a') || '';
-var S = {d: null, inv: null, filtro: 'Todos', q: ''};
+var DISP = (/iPhone|iPad|Android/.test(navigator.userAgent) ? 'teléfono' : 'computadora') + ' ' + (navigator.platform || '');
+var S = {d: null, t: null, f: {prod: 'Todos', lec: 'Todas'}, q: {prod: '', lec: ''}};
 var app = document.getElementById('app');
 
 function call(fn) {
@@ -77,31 +91,24 @@ function call(fn) {
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
 function din(n) { var x = Math.abs(Number(n) || 0).toFixed(2).split('.'); return (n < -0.004 ? '−' : '') + '$' + x[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + x[1]; }
 function uni(n) { n = Number(n) || 0; return (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n); }
+function pct(a, b) { return b ? Math.round(a * 100 / b) + '%' : '—'; }
 var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 function fecha(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? (+m[3]) + '-' + MES[+m[2] - 1] + '-' + m[1] : esc(s); }
+function fh(s) { var m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?/.exec(s || ''); return m ? (+m[3]) + '-' + MES[+m[2] - 1] + ' ' + ('0' + m[4]).slice(-2) + ':' + m[5] + (m[6] ? ':' + m[6] : '') : esc(s); }
+function ms(s) { var m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?/.exec(s || ''); return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)).getTime() : NaN; }
+function dur(a, b) { var s = Math.round((ms(b) - ms(a)) / 1000); if (!(s >= 0)) return '—'; var h = Math.floor(s / 3600), m = Math.round((s % 3600) / 60); return h ? h + ' h ' + m + ' min' : m + ' min'; }
+function cuenta(arr, fn) { var o = {}; arr.forEach(function (x) { var k = fn(x); o[k] = (o[k] || 0) + 1; }); return o; }
+function tag(txt, cls) { return '<span class="tag ' + (cls || '') + '">' + esc(txt) + '</span>'; }
 
-function tipoDe(i) { return i.tipo === 'Cruce' ? 'Cruce' : i.dif < 0 ? 'Faltante' : i.dif > 0 ? 'Sobrante' : 'Cuadra'; }
-
-function totales(inv) {
-  var t = {n: inv.items.length, F: {n: 0, u: 0, c: 0, p: 0}, S: {n: 0, u: 0, c: 0, p: 0}, C: {n: 0, u: 0, c: 0, p: 0}, desc: 0, sis: 0, fis: 0};
-  inv.items.forEach(function (i) {
-    var k = {Faltante: 'F', Sobrante: 'S', Cruce: 'C'}[tipoDe(i)];
-    if (i.sis != null) { t.conSis = true; t.sis += i.sis; t.fis += i.fis || 0; }
-    if (k) { var g = t[k]; g.n++; g.u += i.dif; g.c += i.dif * i.costo; g.p += i.dif * i.pvp; }
-    if (i.cobra && i.dif < 0) t.desc += -i.dif * i.pvp;
-  });
-  t.netoC = t.F.c + t.S.c + t.C.c; t.netoP = t.F.p + t.S.p + t.C.p;
-  return t;
-}
-
+/* ---------- Entrada ---------- */
 function inicio() {
   if (!CLAVE) return pedirClave('');
-  call('apiAudInit', CLAVE, (navigator.platform || '') + ' ' + (window.innerWidth < 700 ? 'teléfono' : 'computadora')).then(function (d) {
+  call('apiAudInit', CLAVE, DISP).then(function (d) {
     S.d = d;
     document.getElementById('sub').textContent = d.auditor + ' · solo lectura · acceso hasta el ' + fecha(d.vence);
-    var h = (location.hash || '').slice(1);
-    var inv = d.inventarios.filter(function (x) { return x.id === decodeURIComponent(h); })[0];
-    if (inv) abrir(inv); else if (d.inventarios.length === 1) abrir(d.inventarios[0]); else lista();
+    var h = decodeURIComponent((location.hash || '').slice(1)).split('|');
+    var t = d.tomas.filter(function (x) { return x.sem === h[0] && x.tienda === h[1]; })[0];
+    if (t) abrir(t); else lista();
   }).catch(function (e) { pedirClave(e.message); });
 }
 
@@ -119,90 +126,236 @@ function pedirClave(err) {
 }
 
 function lista() {
-  S.inv = null; history.replaceState(null, '', location.pathname + location.search);
-  var inv = S.d.inventarios;
-  app.innerHTML = '<div class="titulo">Inventarios cerrados</div>' + (inv.length ? inv.map(function (x, k) {
-    var t = totales(x);
-    return '<div class="card inv" data-k="' + k + '"><div><b>' + esc(x.tienda) + '</b> · ' + fecha(x.fecha) +
-      '<div class="small muted">' + t.n + ' productos · ' + t.F.n + ' faltantes · ' + t.S.n + ' sobrantes · ' + t.C.n + ' en cruces</div></div>' +
-      '<div style="text-align:right"><b class="neg">' + din(t.desc) + '</b><div class="small muted">a descontar</div></div></div>';
-  }).join('') : '<div class="card muted">Todavía no hay inventarios cargados.</div>');
-  app.querySelectorAll('.inv').forEach(function (el) { el.onclick = function () { abrir(inv[+el.getAttribute('data-k')]); }; });
+  history.replaceState(null, '', location.pathname + location.search);
+  var t = S.d.tomas;
+  app.innerHTML = '<h2 style="margin-top:6px">Tomas de inventario cerradas <small>Muestreo Top 50, contado en la tienda con la app</small></h2>' + (t.length ? t.map(function (x, k) {
+    return '<div class="card toma" data-k="' + k + '"><div><b>' + esc(x.tienda) + '</b> · semana ' + esc(x.sem.split('-S')[1] || x.sem) +
+      '<div class="small muted">Enviada ' + fh(x.enviado) + ' por ' + esc(x.por) + ' · ' + x.n + ' productos · exactitud ' + pct(x.ok, x.n) + '</div></div>' +
+      '<div style="text-align:right;white-space:nowrap"><b class="neg">' + din(-x.falt) + '</b><div class="small muted">faltante a PVP</div></div></div>';
+  }).join('') : '<div class="card muted">Todavía no hay tomas cerradas.</div>');
+  app.querySelectorAll('.toma').forEach(function (el) { el.onclick = function () { abrir(t[+el.getAttribute('data-k')]); }; });
 }
 
-function kpi(cls, titulo, g, extra) {
-  return '<div class="kpi ' + cls + '"><span>' + titulo + '</span><b>' + g.n + (g.n === 1 ? ' producto' : ' productos') + ' · ' + uni(g.u) + ' u</b>' +
-    '<small>Costo ' + din(g.c) + ' · PVP ' + din(g.p) + '</small>' + (extra || '') + '</div>';
+function abrir(x) {
+  app.innerHTML = '<div class="card muted">Cargando la toma de ' + esc(x.tienda) + '…</div>';
+  history.replaceState(null, '', location.pathname + location.search + '#' + encodeURIComponent(x.sem + '|' + x.tienda));
+  call('apiAudToma', CLAVE, x.sem, x.tienda, DISP).then(function (t) { S.t = preparar(t); pintar(); window.scrollTo(0, 0); })
+    .catch(function (e) { app.innerHTML = '<div class="aviso bad">' + esc(e.message) + '</div><button class="btn sec" onclick="lista()">‹ Volver</button>'; });
 }
 
-function abrir(inv) {
-  S.inv = inv; S.filtro = 'Todos'; S.q = '';
-  history.replaceState(null, '', location.pathname + location.search + '#' + encodeURIComponent(inv.id));
-  var t = totales(inv);
-  app.innerHTML = (S.d.inventarios.length > 1 ? '<div class="acciones volver"><button class="btn sec" id="volver">‹ Todos los inventarios</button></div>' : '') +
-    '<div class="card"><div class="small muted">Inventario cerrado</div><b style="font-size:20px">' + esc(inv.tienda) + ' · ' + fecha(inv.fecha) + '</b>' +
-    '<div class="small muted">' + t.n + ' productos con diferencia' + (t.conSis ? ' · sistema ' + t.sis + ' u · físico ' + t.fis + ' u' : '') + '</div></div>' +
-    '<div class="kpis">' +
-      kpi('f', 'Faltantes', t.F) + kpi('s', 'Sobrantes', t.S) +
-      kpi('c', 'Cruces (un producto por otro)', t.C) +
-      '<div class="kpi"><span>Neto (faltantes − sobrantes)</span><b class="' + (t.netoP < 0 ? 'neg' : 'pos') + '">' + din(t.netoP) + ' PVP</b><small>Costo ' + din(t.netoC) + '</small></div>' +
-      '<div class="kpi d"><span>Valor a descontar al personal</span><b>' + din(t.desc) + '</b><small>Faltante íntegro a PVP, según la política de faltantes</small></div>' +
-    '</div>' +
-    '<div class="acciones"><button class="btn sec" id="csv">Descargar Excel (CSV)</button><button class="btn sec" id="imp">Imprimir o guardar PDF</button></div>' +
-    '<input type="search" id="buscar" placeholder="Buscar por código o descripción">' +
-    '<div class="chips" id="chips"></div><div class="tabla" id="tabla"></div>' +
-    '<div class="nota">Diferencia = físico − sistema (negativo = falta). Valores por unidad del ERP. Los cruces son productos contados en lugar de otro parecido; no entran al descuento. El reparto por persona no se muestra aquí.</div>';
+/* ---------- Cálculos ---------- */
+function preparar(t) {
+  var rev = {}, asig = {};
+  t.revision.forEach(function (r) { rev[r.cod] = r; });
+  t.asign.forEach(function (a) { (asig[a.cod] = asig[a.cod] || {})[a.ronda] = a.persona; });
+  t.items.forEach(function (i) {
+    i.fin = i.c2 != null ? i.c2 : (i.c1 != null ? i.c1 : 0);
+    i.dif = i.fin - i.teo;
+    i.rev = rev[i.cod] || null;
+    i.asig = asig[i.cod] || {};
+    i.quien = {1: [], 2: []};
+    t.conteos.forEach(function (c) { if (c.cod === i.cod && i.quien[c.ronda]) i.quien[c.ronda].push(c.persona + ' (' + c.q + ', ' + c.met + ')'); });
+  });
+  t.informe = t.informes.length ? t.informes[t.informes.length - 1] : null;
+  return t;
+}
+
+/* ---------- Pantalla de una toma ---------- */
+function pintar() {
+  var t = S.t, it = t.items, n = it.length;
+  var ok1 = it.filter(function (i) { return i.c1 === i.teo; }).length, okF = it.filter(function (i) { return !i.dif; }).length;
+  var rec = it.filter(function (i) { return i.c2 != null; }).length;
+  var g = function (f) { var o = {n: 0, u: 0, c: 0, p: 0}; it.filter(f).forEach(function (i) { o.n++; o.u += i.dif; o.c += i.dif * i.costo; o.p += i.dif * i.pvp; }); return o; };
+  var F = g(function (i) { return i.dif < 0; }), So = g(function (i) { return i.dif > 0; });
+  var lec = t.lecturas, fuera = lec.filter(function (l) { return l.res !== 'OK'; }).length, dig = lec.filter(function (l) { return /Digitado/.test(l.met); }).length;
+  var inf = t.informe;
+  var k = function (cls, tit, val, sub) { return '<div class="kpi ' + cls + '"><span>' + tit + '</span><b>' + val + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>'; };
+
+  app.innerHTML = (S.d.tomas.length > 1 ? '<div class="acciones volver"><button class="btn sec" id="volver">‹ Todas las tomas</button></div>' : '') +
+    '<div class="card"><div class="small muted">Muestreo Top 50 · semana ' + esc(t.sem) + '</div><b style="font-size:20px">' + esc(t.tienda) + '</b>' +
+    '<div class="small muted">Enviada el ' + fh(t.enviado) + ' por ' + esc(t.por) + '</div></div>' +
+    '<nav class="nav"><a href="#s-resumen">Resumen</a><a href="#s-crono">Cronología</a><a href="#s-pers">Personas y equipos</a><a href="#s-prod">Productos</a>' +
+    '<a href="#s-lec">Lecturas y errores</a><a href="#s-rev">Revisión</a><a href="#s-inf">Informe y descuento</a></nav>' +
+
+    '<h2 id="s-resumen">1. Resumen</h2><div class="kpis">' +
+      k('', 'Productos en la lista', n, 'Teórico ' + it.reduce(function (a, i) { return a + i.teo; }, 0) + ' u') +
+      k('', 'Exactitud', pct(okF, n), '1.er conteo ' + pct(ok1, n) + ' · ' + rec + ' fueron a 2.º conteo') +
+      k('f', 'Faltantes según la tienda', F.n + ' prod · ' + uni(F.u) + ' u', 'Costo ' + din(F.c) + ' · PVP ' + din(F.p)) +
+      k('s', 'Sobrantes según la tienda', So.n + ' prod · ' + uni(So.u) + ' u', 'Costo ' + din(So.c) + ' · PVP ' + din(So.p)) +
+      k('c', 'Lecturas', lec.length, fuera + ' fuera de la lista · ' + dig + ' digitadas') +
+      k('d', 'Valor a descontar al personal', inf ? din(inf.desc) : 'Sin informe', inf ? 'Informe ' + esc(inf.id) + ' · ' + esc(inf.estado) : 'Diego aún no emite el informe') +
+    '</div><div class="acciones"><button class="btn sec" id="csv">Descargar productos (Excel)</button><button class="btn sec" id="csvl">Descargar lecturas (Excel)</button><button class="btn sec" id="imp">Imprimir o guardar PDF</button></div>' +
+
+    '<h2 id="s-crono">2. Cronología</h2><div class="card"><ul class="crono">' + cronologia() + '</ul></div>' +
+    '<h2 id="s-pers">3. Personas y equipos <small>quién contó, cuánto, cómo y con qué teléfono</small></h2><div class="pers">' + personas() + '</div>' +
+    '<h2 id="s-prod">4. Productos <small>teórico, cada conteo, quién lo contó y la explicación de la tienda</small></h2>' +
+      '<input type="search" id="qprod" placeholder="Buscar por código o descripción"><div class="chips" id="fprod"></div><div class="tabla" id="tprod"></div>' +
+    '<h2 id="s-lec">5. Lecturas y errores <small>cada código leído o digitado, al segundo</small></h2>' + errores() +
+      '<input type="search" id="qlec" placeholder="Buscar por código, persona o equipo"><div class="chips" id="flec"></div><div class="tabla" id="tlec"></div>' +
+    '<h2 id="s-rev">6. Revisión de Diego Revelo <small>decisión final sobre cada diferencia</small></h2>' + revision() +
+    '<h2 id="s-inf">7. Informe y descuento</h2>' + informe() +
+    '<div class="nota">Diferencia = conteo final de la tienda − teórico del sistema (negativo = falta); la revisión de Diego (sección 6) puede cambiarla y el informe (sección 7) usa la diferencia ya revisada. Costo y PVP unitarios del ERP al publicar la lista. Los equipos se registran desde el 23-oct-2026; las lecturas anteriores dicen "no registrado".</div>';
+
   if (document.getElementById('volver')) document.getElementById('volver').onclick = lista;
-  document.getElementById('csv').onclick = function () { csv(inv); };
+  document.getElementById('csv').onclick = csvProductos;
+  document.getElementById('csvl').onclick = csvLecturas;
   document.getElementById('imp').onclick = function () { window.print(); };
-  document.getElementById('buscar').oninput = function (e) { S.q = e.target.value.trim().toLowerCase(); tabla(); };
-  tabla();
-  window.scrollTo(0, 0);
+  document.getElementById('qprod').oninput = function (e) { S.q.prod = e.target.value.trim().toLowerCase(); productos(); };
+  document.getElementById('qlec').oninput = function (e) { S.q.lec = e.target.value.trim().toLowerCase(); lecturas(); };
+  productos(); lecturas();
 }
 
-function visibles() {
-  return S.inv.items.filter(function (i) {
-    if (S.filtro !== 'Todos' && tipoDe(i) !== S.filtro) return false;
-    return !S.q || (i.cod + ' ' + i.desc).toLowerCase().indexOf(S.q) >= 0;
+function cronologia() {
+  var t = S.t, ev = [];
+  var pub = t.items.map(function (i) { return i.pub; }).filter(Boolean).sort()[0];
+  if (pub) ev.push([pub, 'Diego Revelo publica la lista de ' + t.items.length + ' productos']);
+  [1, 2].forEach(function (r) {
+    var a = t.asign.filter(function (x) { return x.ronda === r; }).sort(function (x, y) { return x.f.localeCompare(y.f); });
+    if (a.length) ev.push([a[0].f, esc(a[0].asigno) + ' reparte ' + a.length + ' productos de la ' + (r === 1 ? '1.ª' : '2.ª') + ' ronda entre ' + Object.keys(cuenta(a, function (x) { return x.persona; })).length + ' personas']);
+    var l = t.lecturas.filter(function (x) { return x.ronda === r; });
+    if (l.length) {
+      ev.push([l[0].f, (r === 1 ? 'Empieza el conteo' : 'Empieza el 2.º conteo') + ' (' + esc(l[0].persona) + ')']);
+      ev.push([l[l.length - 1].f, (r === 1 ? 'Última lectura del 1.er conteo' : 'Última lectura del 2.º conteo') + ' (' + esc(l[l.length - 1].persona) + ') · ' + l.length + ' lecturas en ' + dur(l[0].f, l[l.length - 1].f)]);
+    }
   });
+  ev.push([t.enviado, esc(t.por) + ' cierra y envía la toma con la explicación de cada diferencia']);
+  t.revision.forEach(function (r) { ev.push([r.f, esc(r.por || 'Diego') + ' revisa ' + esc(r.cod) + ': ' + esc(r.dec)]); });
+  t.informes.forEach(function (i) { ev.push([i.fecha + ' ' + i.hora, esc(i.elaboro) + ' emite el informe ' + esc(i.id) + ' · ' + esc(i.estado)]); });
+  ev.sort(function (a, b) { return String(a[0]).localeCompare(String(b[0])); });
+  return ev.map(function (e) { return '<li><time>' + fh(e[0]) + '</time><span>' + e[1] + '</span></li>'; }).join('');
 }
 
-function tabla() {
-  var cuenta = {Todos: 0, Faltante: 0, Sobrante: 0, Cruce: 0};
-  S.inv.items.forEach(function (i) { cuenta.Todos++; if (cuenta[tipoDe(i)] != null) cuenta[tipoDe(i)]++; });
-  var nombres = {Todos: 'Todos', Faltante: 'Faltantes', Sobrante: 'Sobrantes', Cruce: 'Cruces'};
-  var ch = document.getElementById('chips');
-  ch.innerHTML = Object.keys(nombres).filter(function (k) { return k === 'Todos' || cuenta[k]; }).map(function (k) {
-    return '<button data-f="' + k + '" class="' + (S.filtro === k ? 'on' : '') + '">' + nombres[k] + ' ' + cuenta[k] + '</button>';
+function personas() {
+  var t = S.t, por = {};
+  t.lecturas.forEach(function (l) { (por[l.persona] = por[l.persona] || {l: [], c: [], a: 0}).l.push(l); });
+  t.conteos.forEach(function (c) { (por[c.persona] = por[c.persona] || {l: [], c: [], a: 0}).c.push(c); });
+  t.asign.forEach(function (a) { (por[a.persona] = por[a.persona] || {l: [], c: [], a: 0}).a++; });
+  var nombres = Object.keys(por).sort(function (a, b) { return por[b].l.length - por[a].l.length; });
+  if (!nombres.length) return '<div class="card muted">Sin registros de personas.</div>';
+  return nombres.map(function (p) {
+    var x = por[p], l = x.l, met = cuenta(l, function (y) { return y.met || '—'; });
+    var fuera = l.filter(function (y) { return y.res !== 'OK'; }).length;
+    var prods = Object.keys(cuenta(x.c, function (y) { return y.cod; })).length;
+    var rondas = Object.keys(cuenta(x.c.concat(l), function (y) { return y.ronda; })).sort().join(' y ');
+    var eqs = Object.keys(cuenta(l.concat(x.c), function (y) { return y.eq || ''; })).filter(Boolean);
+    return '<div class="card"><b>' + esc(p) + '</b>' + (p === t.por ? ' ' + tag('Cerró y envió', 'info') : '') +
+      '<dl><dt>Rondas</dt><dd>' + (rondas || '—') + '</dd>' +
+      '<dt>Asignados</dt><dd>' + x.a + ' productos</dd>' +
+      '<dt>Contó</dt><dd>' + prods + ' productos</dd>' +
+      '<dt>Lecturas</dt><dd>' + l.length + (fuera ? ' · <span class="neg">' + fuera + ' fuera de la lista</span>' : '') + '</dd>' +
+      '<dt>Cómo</dt><dd>' + (Object.keys(met).map(function (m) { return m + ' ' + met[m]; }).join(' · ') || '—') + '</dd>' +
+      '<dt>Primera / última</dt><dd>' + (l.length ? fh(l[0].f) + ' → ' + fh(l[l.length - 1].f) : '—') + '</dd>' +
+      '<dt>Tiempo</dt><dd>' + (l.length ? dur(l[0].f, l[l.length - 1].f) : '—') + '</dd></dl>' +
+      '<div class="eq"><b>Equipo:</b> ' + (eqs.length ? eqs.map(esc).join('<br>') : 'no registrado (conteo anterior al 23-oct)') + '</div></div>';
   }).join('');
-  ch.querySelectorAll('button').forEach(function (b) { b.onclick = function () { S.filtro = b.getAttribute('data-f'); tabla(); }; });
-  var v = visibles(), sc = 0, sp = 0, sd = 0;
-  var cs = S.inv.items.some(function (i) { return i.sis != null; });   /* algunos inventarios solo traen la diferencia */
+}
+
+function productos() {
+  var t = S.t, F = {Todos: function () { return true; }, 'Con diferencia': function (i) { return i.dif; }, '2.º conteo': function (i) { return i.c2 != null; },
+    'Revisados': function (i) { return i.rev; }};
+  var ch = document.getElementById('fprod');
+  ch.innerHTML = Object.keys(F).map(function (k) { return '<button data-f="' + k + '" class="' + (S.f.prod === k ? 'on' : '') + '">' + k + ' ' + t.items.filter(F[k]).length + '</button>'; }).join('');
+  ch.querySelectorAll('button').forEach(function (b) { b.onclick = function () { S.f.prod = b.getAttribute('data-f'); productos(); }; });
+  var v = t.items.filter(F[S.f.prod]).filter(function (i) { return !S.q.prod || (i.cod + ' ' + i.desc + ' ' + i.barras).toLowerCase().indexOf(S.q.prod) >= 0; });
+  var sc = 0, sp = 0;
   var filas = v.map(function (i) {
-    var dc = i.dif * i.costo, dp = i.dif * i.pvp, cl = i.dif < 0 ? 'neg' : i.dif > 0 ? 'pos' : '';
-    sc += dc; sp += dp; if (i.cobra && i.dif < 0) sd += -dp;
-    return '<tr><td class="cod">' + esc(i.cod) + '</td><td class="t">' + esc(i.desc) + (i.nota ? '<div class="small muted">' + esc(i.nota) + '</div>' : '') + '</td>' +
-      (cs ? '<td>' + (i.sis == null ? '—' : i.sis) + '</td><td>' + (i.fis == null ? '—' : i.fis) + '</td>' : '') + '<td class="' + cl + '"><b>' + uni(i.dif) + '</b></td>' +
-      '<td>' + din(i.costo) + '</td><td>' + din(i.pvp) + '</td><td class="' + cl + '">' + din(dc) + '</td><td class="' + cl + '">' + din(dp) + '</td>' +
-      '<td style="text-align:left"><span class="tag ' + tipoDe(i) + '">' + tipoDe(i) + '</span></td><td>' + (i.cobra && i.dif < 0 ? 'Sí' : 'No') + '</td></tr>';
+    var cl = i.dif < 0 ? 'neg' : i.dif > 0 ? 'pos' : '';
+    sc += i.dif * i.costo; sp += i.dif * i.pvp;
+    var est = i.dif ? tag(i.dif < 0 ? 'Falta' : 'Sobra', i.dif < 0 ? 'bad' : 'ok') : tag(i.c2 != null ? 'OK en 2.º' : 'OK', i.c2 != null ? 'warn' : '');
+    return '<tr><td>' + i.n + '</td><td class="l">' + esc(i.cod) + '</td><td class="t">' + esc(i.desc) + '<div class="small muted">' + esc(i.motivo) + ' · ' + esc(i.grupo) + '</div></td>' +
+      '<td>' + i.teo + '</td><td>' + (i.c1 == null ? '—' : i.c1) + '</td><td>' + (i.c2 == null ? '—' : i.c2) + '</td><td><b>' + i.fin + '</b></td>' +
+      '<td class="' + cl + '"><b>' + uni(i.dif) + '</b></td><td>' + din(i.costo) + '</td><td>' + din(i.pvp) + '</td><td class="' + cl + '">' + din(i.dif * i.costo) + '</td><td class="' + cl + '">' + din(i.dif * i.pvp) + '</td>' +
+      '<td class="l">' + est + '</td>' +
+      '<td class="t small">' + (i.quien[1].length ? '1.º: ' + esc(i.quien[1].join(', ')) : (i.asig[1] ? 'Asignado a ' + esc(i.asig[1]) + ', sin conteo' : '—')) + (i.quien[2].length ? '<br>2.º: ' + esc(i.quien[2].join(', ')) : '') + '</td>' +
+      '<td class="t small">' + (i.causa ? '<b>' + esc(i.causa) + ':</b> ' : '') + esc(i.exp) + '</td>' +
+      '<td class="t small">' + (i.rev ? '<b>' + esc(i.rev.dec) + '</b> ' + esc(i.rev.com) : '') + '</td></tr>';
   }).join('');
-  document.getElementById('tabla').innerHTML = '<table><thead><tr><th class="cod">Código</th><th class="t">Descripción</th>' + (cs ? '<th>Sistema</th><th>Físico</th>' : '') + '<th>Dif.</th>' +
-    '<th>Costo u.</th><th>PVP u.</th><th>Dif. costo</th><th>Dif. PVP</th><th style="text-align:left">Tipo</th><th>Se descuenta</th></tr></thead><tbody>' +
-    (filas || '<tr><td colspan="' + (cs ? 11 : 9) + '" class="t muted">Sin resultados</td></tr>') + '</tbody>' +
-    '<tfoot><tr><td class="cod" colspan="' + (cs ? 7 : 5) + '">' + v.length + ' productos</td><td>' + din(sc) + '</td><td>' + din(sp) + '</td><td></td><td>' + din(sd) + '</td></tr></tfoot></table>';
+  document.getElementById('tprod').innerHTML = '<table><thead><tr><th>N</th><th class="l">Código</th><th class="l">Descripción</th><th>Teórico</th><th>1.º</th><th>2.º</th><th>Final</th><th>Dif.</th>' +
+    '<th>Costo u.</th><th>PVP u.</th><th>Dif. costo</th><th>Dif. PVP</th><th class="l">Estado</th><th class="l">Quién contó (cantidad, cómo)</th><th class="l">Explicación de la tienda</th><th class="l">Revisión</th></tr></thead><tbody>' +
+    (filas || '<tr><td colspan="16" class="t muted">Sin resultados</td></tr>') + '</tbody>' +
+    '<tfoot><tr><td colspan="10" class="l">' + v.length + ' productos</td><td>' + din(sc) + '</td><td>' + din(sp) + '</td><td colspan="4"></td></tr></tfoot></table>';
 }
 
-function csv(inv) {
+function errores() {
+  var l = S.t.lecturas, it = S.t.items;
+  var fuera = l.filter(function (x) { return x.res !== 'OK'; }), cod = Object.keys(cuenta(fuera, function (x) { return x.leido; }));
+  var dig = l.filter(function (x) { return /Digitado/.test(x.met); }).length, foto = l.filter(function (x) { return /Foto/.test(x.met); }).length;
+  var sinLec = it.filter(function (i) { return !l.some(function (x) { return x.cod === i.cod; }); }).length;
+  var cambio = it.filter(function (i) { return i.c2 != null && i.c1 !== i.c2; }).length;
+  var li = function (txt, n, cls) { return '<li><span class="tag ' + (n ? cls : '') + '">' + n + '</span> ' + txt + '</li>'; };
+  return '<div class="card"><ul style="margin:0;padding-left:0;list-style:none;display:grid;gap:6px">' +
+    li('lecturas de códigos que no están en la lista (' + cod.length + ' códigos distintos)', fuera.length, 'bad') +
+    li('cantidades digitadas a mano en vez de escanear', dig, 'warn') +
+    li('lecturas por foto (sin cámara en vivo)', foto, 'warn') +
+    li('productos de la lista sin ninguna lectura (cantidad escrita directo o 0 al cerrar)', sinLec, 'warn') +
+    li('productos cuyo 2.º conteo cambió respecto al 1.º', cambio, 'warn') + '</ul></div>';
+}
+
+function lecturas() {
+  var t = S.t, rep = {};
+  t.lecturas.forEach(function (x, k) { var c = x.persona + '|' + x.leido; x.rep = !!rep[c] && ms(x.f) - rep[c] < 10000; rep[c] = ms(x.f); });
+  var F = {Todas: function () { return true; }, 'Fuera de la lista': function (x) { return x.res !== 'OK'; }, Digitadas: function (x) { return /Digitado/.test(x.met); },
+    Foto: function (x) { return /Foto/.test(x.met); }, 'Repetidas (<10 s)': function (x) { return x.rep; }, '2.º conteo': function (x) { return x.ronda === 2; }};
+  var ch = document.getElementById('flec');
+  ch.innerHTML = Object.keys(F).map(function (k) { return '<button data-f="' + k + '" class="' + (S.f.lec === k ? 'on' : '') + '">' + k + ' ' + t.lecturas.filter(F[k]).length + '</button>'; }).join('');
+  ch.querySelectorAll('button').forEach(function (b) { b.onclick = function () { S.f.lec = b.getAttribute('data-f'); lecturas(); }; });
+  var desc = {}; t.items.forEach(function (i) { desc[i.cod] = i.desc; });
+  var v = t.lecturas.filter(F[S.f.lec]).filter(function (x) { return !S.q.lec || (x.leido + ' ' + x.cod + ' ' + x.persona + ' ' + x.eq).toLowerCase().indexOf(S.q.lec) >= 0; });
+  document.getElementById('tlec').innerHTML = '<table><thead><tr><th class="l">Fecha y hora</th><th class="l">Persona</th><th>Ronda</th><th class="l">Leído</th><th class="l">Producto</th><th class="l">Cómo</th><th>Cantidad</th><th class="l">Resultado</th><th class="l">Equipo</th></tr></thead><tbody>' +
+    (v.map(function (x) {
+      return '<tr><td class="l">' + fh(x.f) + '</td><td class="l">' + esc(x.persona) + '</td><td>' + x.ronda + '</td><td class="l">' + esc(x.leido) + '</td>' +
+        '<td class="t">' + (x.cod ? esc(x.cod) + ' · ' + esc(desc[x.cod] || '') : '—') + '</td><td class="l">' + esc(x.met) + '</td><td>' + (x.q == null ? '' : x.q) + '</td>' +
+        '<td class="l">' + (x.res === 'OK' ? tag('OK', 'ok') : tag(x.res, 'bad')) + (x.rep ? ' ' + tag('repetida', 'warn') : '') + '</td><td class="l small">' + esc(x.eq || 'no registrado') + '</td></tr>';
+    }).join('') || '<tr><td colspan="9" class="t muted">Sin lecturas</td></tr>') + '</tbody></table>';
+}
+
+function revision() {
+  var r = S.t.revision;
+  if (!r.length) return '<div class="card muted">Diego aún no registra revisiones para esta toma.</div>';
+  return '<div class="tabla"><table><thead><tr><th class="l">Fecha</th><th class="l">Código</th><th class="l">Descripción</th><th>Sistema</th><th>Tienda</th><th>Recuento</th><th>Dif. final</th><th class="l">Decisión</th><th class="l">Comentario</th><th class="l">Por</th></tr></thead><tbody>' +
+    r.map(function (x) {
+      return '<tr><td class="l">' + fh(x.f) + '</td><td class="l">' + esc(x.cod) + '</td><td class="t">' + esc(x.desc) + '</td><td>' + x.sis + '</td><td>' + x.tienda + '</td><td>' + (x.recuento == null ? '—' : x.recuento) + '</td>' +
+        '<td class="' + (x.fin < 0 ? 'neg' : x.fin > 0 ? 'pos' : '') + '"><b>' + uni(x.fin) + '</b></td><td class="l">' + tag(x.dec, /cargo/.test(x.dec) ? 'bad' : /Ajustar/.test(x.dec) ? 'info' : /Cuadra/.test(x.dec) ? 'ok' : 'warn') + '</td><td class="t">' + esc(x.com) + '</td><td class="l">' + esc(x.por) + '</td></tr>';
+    }).join('') + '</tbody></table></div>';
+}
+
+function informe() {
+  var t = S.t;
+  if (!t.informes.length) return '<div class="card muted">Diego aún no emite el informe de inventario de esta toma.</div>';
+  return t.informes.slice().reverse().map(function (i, k) {
+    return '<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b>Informe ' + esc(i.id) + '</b>' + (k ? ' ' + tag('versión anterior') : '') +
+      '<div class="small muted">' + fecha(i.fecha) + ' ' + esc(i.hora) + ' · elaboró ' + esc(i.elaboro) + '</div></div><div>' + tag(i.estado, /Firmado/i.test(i.estado) ? 'ok' : 'warn') + '</div></div>' +
+      '<div class="kpis"><div class="kpi f"><span>Faltante a PVP</span><b>' + din(i.falt) + '</b></div><div class="kpi s"><span>Sobrante a PVP</span><b>' + din(i.sobr) + '</b></div>' +
+      '<div class="kpi d"><span>A descontar al personal</span><b>' + din(i.desc) + '</b><small>Total; no se muestra el reparto por persona</small></div></div>' +
+      (i.regla ? '<div class="small"><b>Regla:</b> ' + esc(i.regla) + '</div>' : '') + (i.obs ? '<div class="small"><b>Observaciones:</b> ' + esc(i.obs) + '</div>' : '') +
+      (i.items.length ? '<div class="tabla" style="margin-top:8px"><table><thead><tr><th class="l">Código</th><th class="l">Descripción</th><th>Sistema</th><th>Contado</th><th>Dif.</th><th>PVP u.</th><th>Total PVP</th><th class="l">Decisión</th><th>Se descuenta</th></tr></thead><tbody>' +
+        i.items.map(function (x) {
+          return '<tr><td class="l">' + esc(x.cod) + '</td><td class="t">' + esc(x.desc) + '</td><td>' + x.sis + '</td><td>' + x.cont + '</td><td class="' + (x.dif < 0 ? 'neg' : 'pos') + '">' + uni(x.dif) + '</td><td>' + din(x.pvp) + '</td><td>' + din(x.tot) + '</td><td class="l">' + esc(x.dec) + '</td><td>' + (x.des ? 'Sí' : 'No') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' : '') + '</div>';
+  }).join('');
+}
+
+/* ---------- Descargas ---------- */
+function bajar(nombre, filas) {
   var c = function (s) { s = String(s == null ? '' : s); return /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
-  var n = function (x) { return (Number(x) || 0).toFixed(2).replace('.', ','); };
-  var out = [['Tienda', 'Fecha', 'Código', 'Descripción', 'Sistema', 'Físico', 'Diferencia', 'Costo unitario', 'PVP unitario', 'Dif. costo', 'Dif. PVP', 'Tipo', 'Se descuenta', 'Nota'].join(';')];
-  inv.items.forEach(function (i) {
-    out.push([inv.tienda, inv.fecha, i.cod, i.desc, i.sis == null ? '' : i.sis, i.fis == null ? '' : i.fis, i.dif, n(i.costo), n(i.pvp), n(i.dif * i.costo), n(i.dif * i.pvp), tipoDe(i), i.cobra && i.dif < 0 ? 'Sí' : 'No', i.nota].map(c).join(';'));
-  });
   var a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['﻿' + out.join('\r\n')], {type: 'text/csv;charset=utf-8'}));
-  a.download = 'Inventario ' + inv.tienda + ' ' + inv.fecha + '.csv';
-  document.body.appendChild(a); a.click(); a.remove();
+  a.href = URL.createObjectURL(new Blob(['﻿' + filas.map(function (r) { return r.map(c).join(';'); }).join('\r\n')], {type: 'text/csv;charset=utf-8'}));
+  a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+}
+function n2(x) { return (Number(x) || 0).toFixed(2).replace('.', ','); }
+function csvProductos() {
+  var t = S.t;
+  bajar('Toma ' + t.tienda + ' ' + t.sem + ' productos.csv', [['N', 'Código', 'Descripción', 'Motivo', 'Grupo', 'Barras', 'Teórico', 'Conteo 1', 'Conteo 2', 'Final', 'Diferencia', 'Costo u', 'PVP u', 'Dif costo', 'Dif PVP',
+    'Quién contó 1', 'Quién contó 2', 'Causa', 'Explicación', 'Revisión', 'Comentario revisión']].concat(t.items.map(function (i) {
+    return [i.n, i.cod, i.desc, i.motivo, i.grupo, i.barras, i.teo, i.c1, i.c2, i.fin, i.dif, n2(i.costo), n2(i.pvp), n2(i.dif * i.costo), n2(i.dif * i.pvp),
+      i.quien[1].join(', '), i.quien[2].join(', '), i.causa, i.exp, i.rev ? i.rev.dec : '', i.rev ? i.rev.com : ''];
+  })));
+}
+function csvLecturas() {
+  var t = S.t;
+  bajar('Toma ' + t.tienda + ' ' + t.sem + ' lecturas.csv', [['Fecha y hora', 'Persona', 'Ronda', 'Leído', 'Código', 'Cómo', 'Cantidad', 'Resultado', 'Equipo']].concat(t.lecturas.map(function (x) {
+    return [x.f, x.persona, x.ronda, x.leido, x.cod, x.met, x.q, x.res, x.eq];
+  })));
 }
 
 inicio();
