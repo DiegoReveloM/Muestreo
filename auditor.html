@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0b4f8a">
+<title>Auditoría de inventarios</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#fff; --ink:#16202c; --muted:#5d6b7a; --line:#e2e7ee;
+  --brand:#0b4f8a; --brand-soft:#e7f0f9;
+  --ok:#1a7f4b; --ok-soft:#e5f5ec; --warn:#b26a00; --warn-soft:#fff3df; --bad:#c0352b; --bad-soft:#fde9e7;
+  --radius:12px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+header h1{font-size:18px;margin:0;font-weight:700}
+header .sub{font-size:13px;opacity:.85}
+main{max-width:1000px;margin:0 auto;padding:12px 16px 60px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.muted{color:var(--muted)} .small{font-size:13px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
+.btn.sec{background:var(--brand-soft);color:var(--brand)}
+input[type=search],input[type=password]{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.titulo{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:16px 2px 6px}
+.aviso{padding:12px 14px;border-radius:10px;margin-bottom:10px;font-size:14px}
+.aviso.bad{background:var(--bad-soft);color:var(--bad)} .aviso.warn{background:var(--warn-soft);color:var(--warn)}
+.inv{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.inv b{font-size:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:8px 0}
+.kpi{background:var(--card);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;border-left:4px solid var(--line)}
+.kpi.f{border-left-color:var(--bad)} .kpi.s{border-left-color:var(--ok)} .kpi.c{border-left-color:var(--warn)} .kpi.d{border-left-color:var(--brand);background:var(--brand-soft)}
+.kpi span{font-size:12px;color:var(--muted);display:block}
+.kpi b{font-size:20px;font-variant-numeric:tabular-nums}
+.kpi small{display:block;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.chips button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.tabla{overflow-x:auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:#f8fafc;font-size:12px;color:var(--muted);position:sticky;top:0}
+td.t,th.t{text-align:left;white-space:normal;min-width:180px}
+td.cod,th.cod{text-align:left}
+tfoot td{font-weight:700;background:#f8fafc}
+.neg{color:var(--bad)} .pos{color:var(--ok)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px}
+.tag.Faltante{background:var(--bad-soft);color:var(--bad)} .tag.Sobrante{background:var(--ok-soft);color:var(--ok)} .tag.Cruce{background:var(--warn-soft);color:var(--warn)}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.nota{font-size:12px;color:var(--muted);margin-top:10px}
+@media (max-width:600px){main{padding:10px 12px 50px}.kpis{grid-template-columns:1fr 1fr}.kpi b{font-size:17px}}
+@media print{header,.acciones,.chips,#buscar,.volver{display:none!important}body{background:#fff}.card,.kpi,.tabla{box-shadow:none;border:1px solid var(--line)}th{position:static}main{max-width:none;padding:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Auditoría de inventarios</h1>
+  <div class="sub" id="sub">Steren Ecuador · solo lectura</div>
+</header>
+<main id="app"><div class="card muted">Cargando…</div></main>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxvxIW9iw7D6IyKTMx5Xyj9BW4d_u7G4BMVwRzaI9ug1MIB1tdfVCAWhu2iIWjbz0lgMA/exec';
+var CLAVE = new URLSearchParams(location.search).get('a') || '';
+var S = {d: null, inv: null, filtro: 'Todos', q: ''};
+var app = document.getElementById('app');
+
+function call(fn) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return fetch(API, {method: 'POST', body: JSON.stringify({fn: fn, args: args}), headers: {'Content-Type': 'text/plain;charset=utf-8'}})
+    .then(function (r) { return r.json(); })
+    .then(function (x) { if (!x.ok) throw new Error(x.error || 'Error'); return x.r; });
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
+function din(n) { var x = Math.abs(Number(n) || 0).toFixed(2).split('.'); return (n < -0.004 ? '−' : '') + '$' + x[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + x[1]; }
+function uni(n) { n = Number(n) || 0; return (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n); }
+var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function fecha(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? (+m[3]) + '-' + MES[+m[2] - 1] + '-' + m[1] : esc(s); }
+
+function tipoDe(i) { return i.tipo === 'Cruce' ? 'Cruce' : i.dif < 0 ? 'Faltante' : i.dif > 0 ? 'Sobrante' : 'Cuadra'; }
+
+function totales(inv) {
+  var t = {n: inv.items.length, F: {n: 0, u: 0, c: 0, p: 0}, S: {n: 0, u: 0, c: 0, p: 0}, C: {n: 0, u: 0, c: 0, p: 0}, desc: 0, sis: 0, fis: 0};
+  inv.items.forEach(function (i) {
+    var k = {Faltante: 'F', Sobrante: 'S', Cruce: 'C'}[tipoDe(i)];
+    if (i.sis != null) { t.conSis = true; t.sis += i.sis; t.fis += i.fis || 0; }
+    if (k) { var g = t[k]; g.n++; g.u += i.dif; g.c += i.dif * i.costo; g.p += i.dif * i.pvp; }
+    if (i.cobra && i.dif < 0) t.desc += -i.dif * i.pvp;
+  });
+  t.netoC = t.F.c + t.S.c + t.C.c; t.netoP = t.F.p + t.S.p + t.C.p;
+  return t;
+}
+
+function inicio() {
+  if (!CLAVE) return pedirClave('');
+  call('apiAudInit', CLAVE, (navigator.platform || '') + ' ' + (window.innerWidth < 700 ? 'teléfono' : 'computadora')).then(function (d) {
+    S.d = d;
+    document.getElementById('sub').textContent = d.auditor + ' · solo lectura · acceso hasta el ' + fecha(d.vence);
+    var h = (location.hash || '').slice(1);
+    var inv = d.inventarios.filter(function (x) { return x.id === decodeURIComponent(h); })[0];
+    if (inv) abrir(inv); else if (d.inventarios.length === 1) abrir(d.inventarios[0]); else lista();
+  }).catch(function (e) { pedirClave(e.message); });
+}
+
+function pedirClave(err) {
+  app.innerHTML = (err ? '<div class="aviso bad">' + esc(err) + '</div>' : '') +
+    '<div class="card"><p style="margin-top:0">Ingresa la clave de acceso que te entregó Diego Revelo.</p>' +
+    '<input type="password" id="cl" autocomplete="off" placeholder="Clave"><div class="acciones"><button class="btn" id="entrar">Entrar</button></div></div>';
+  document.getElementById('entrar').onclick = function () {
+    CLAVE = document.getElementById('cl').value.trim();
+    if (!CLAVE) return;
+    history.replaceState(null, '', location.pathname + '?a=' + encodeURIComponent(CLAVE));
+    app.innerHTML = '<div class="card muted">Cargando…</div>';
+    inicio();
+  };
+}
+
+function lista() {
+  S.inv = null; history.replaceState(null, '', location.pathname + location.search);
+  var inv = S.d.inventarios;
+  app.innerHTML = '<div class="titulo">Inventarios cerrados</div>' + (inv.length ? inv.map(function (x, k) {
+    var t = totales(x);
+    return '<div class="card inv" data-k="' + k + '"><div><b>' + esc(x.tienda) + '</b> · ' + fecha(x.fecha) +
+      '<div class="small muted">' + t.n + ' productos · ' + t.F.n + ' faltantes · ' + t.S.n + ' sobrantes · ' + t.C.n + ' en cruces</div></div>' +
+      '<div style="text-align:right"><b class="neg">' + din(t.desc) + '</b><div class="small muted">a descontar</div></div></div>';
+  }).join('') : '<div class="card muted">Todavía no hay inventarios cargados.</div>');
+  app.querySelectorAll('.inv').forEach(function (el) { el.onclick = function () { abrir(inv[+el.getAttribute('data-k')]); }; });
+}
+
+function kpi(cls, titulo, g, extra) {
+  return '<div class="kpi ' + cls + '"><span>' + titulo + '</span><b>' + g.n + (g.n === 1 ? ' producto' : ' productos') + ' · ' + uni(g.u) + ' u</b>' +
+    '<small>Costo ' + din(g.c) + ' · PVP ' + din(g.p) + '</small>' + (extra || '') + '</div>';
+}
+
+function abrir(inv) {
+  S.inv = inv; S.filtro = 'Todos'; S.q = '';
+  history.replaceState(null, '', location.pathname + location.search + '#' + encodeURIComponent(inv.id));
+  var t = totales(inv);
+  app.innerHTML = (S.d.inventarios.length > 1 ? '<div class="acciones volver"><button class="btn sec" id="volver">‹ Todos los inventarios</button></div>' : '') +
+    '<div class="card"><div class="small muted">Inventario cerrado</div><b style="font-size:20px">' + esc(inv.tienda) + ' · ' + fecha(inv.fecha) + '</b>' +
+    '<div class="small muted">' + t.n + ' productos con diferencia' + (t.conSis ? ' · sistema ' + t.sis + ' u · físico ' + t.fis + ' u' : '') + '</div></div>' +
+    '<div class="kpis">' +
+      kpi('f', 'Faltantes', t.F) + kpi('s', 'Sobrantes', t.S) +
+      kpi('c', 'Cruces (un producto por otro)', t.C) +
+      '<div class="kpi"><span>Neto (faltantes − sobrantes)</span><b class="' + (t.netoP < 0 ? 'neg' : 'pos') + '">' + din(t.netoP) + ' PVP</b><small>Costo ' + din(t.netoC) + '</small></div>' +
+      '<div class="kpi d"><span>Valor a descontar al personal</span><b>' + din(t.desc) + '</b><small>Faltante íntegro a PVP, según la política de faltantes</small></div>' +
+    '</div>' +
+    '<div class="acciones"><button class="btn sec" id="csv">Descargar Excel (CSV)</button><button class="btn sec" id="imp">Imprimir o guardar PDF</button></div>' +
+    '<input type="search" id="buscar" placeholder="Buscar por código o descripción">' +
+    '<div class="chips" id="chips"></div><div class="tabla" id="tabla"></div>' +
+    '<div class="nota">Diferencia = físico − sistema (negativo = falta). Valores por unidad del ERP. Los cruces son productos contados en lugar de otro parecido; no entran al descuento. El reparto por persona no se muestra aquí.</div>';
+  if (document.getElementById('volver')) document.getElementById('volver').onclick = lista;
+  document.getElementById('csv').onclick = function () { csv(inv); };
+  document.getElementById('imp').onclick = function () { window.print(); };
+  document.getElementById('buscar').oninput = function (e) { S.q = e.target.value.trim().toLowerCase(); tabla(); };
+  tabla();
+  window.scrollTo(0, 0);
+}
+
+function visibles() {
+  return S.inv.items.filter(function (i) {
+    if (S.filtro !== 'Todos' && tipoDe(i) !== S.filtro) return false;
+    return !S.q || (i.cod + ' ' + i.desc).toLowerCase().indexOf(S.q) >= 0;
+  });
+}
+
+function tabla() {
+  var cuenta = {Todos: 0, Faltante: 0, Sobrante: 0, Cruce: 0};
+  S.inv.items.forEach(function (i) { cuenta.Todos++; if (cuenta[tipoDe(i)] != null) cuenta[tipoDe(i)]++; });
+  var nombres = {Todos: 'Todos', Faltante: 'Faltantes', Sobrante: 'Sobrantes', Cruce: 'Cruces'};
+  var ch = document.getElementById('chips');
+  ch.innerHTML = Object.keys(nombres).filter(function (k) { return k === 'Todos' || cuenta[k]; }).map(function (k) {
+    return '<button data-f="' + k + '" class="' + (S.filtro === k ? 'on' : '') + '">' + nombres[k] + ' ' + cuenta[k] + '</button>';
+  }).join('');
+  ch.querySelectorAll('button').forEach(function (b) { b.onclick = function () { S.filtro = b.getAttribute('data-f'); tabla(); }; });
+  var v = visibles(), sc = 0, sp = 0, sd = 0;
+  var cs = S.inv.items.some(function (i) { return i.sis != null; });   /* algunos inventarios solo traen la diferencia */
+  var filas = v.map(function (i) {
+    var dc = i.dif * i.costo, dp = i.dif * i.pvp, cl = i.dif < 0 ? 'neg' : i.dif > 0 ? 'pos' : '';
+    sc += dc; sp += dp; if (i.cobra && i.dif < 0) sd += -dp;
+    return '<tr><td class="cod">' + esc(i.cod) + '</td><td class="t">' + esc(i.desc) + (i.nota ? '<div class="small muted">' + esc(i.nota) + '</div>' : '') + '</td>' +
+      (cs ? '<td>' + (i.sis == null ? '—' : i.sis) + '</td><td>' + (i.fis == null ? '—' : i.fis) + '</td>' : '') + '<td class="' + cl + '"><b>' + uni(i.dif) + '</b></td>' +
+      '<td>' + din(i.costo) + '</td><td>' + din(i.pvp) + '</td><td class="' + cl + '">' + din(dc) + '</td><td class="' + cl + '">' + din(dp) + '</td>' +
+      '<td style="text-align:left"><span class="tag ' + tipoDe(i) + '">' + tipoDe(i) + '</span></td><td>' + (i.cobra && i.dif < 0 ? 'Sí' : 'No') + '</td></tr>';
+  }).join('');
+  document.getElementById('tabla').innerHTML = '<table><thead><tr><th class="cod">Código</th><th class="t">Descripción</th>' + (cs ? '<th>Sistema</th><th>Físico</th>' : '') + '<th>Dif.</th>' +
+    '<th>Costo u.</th><th>PVP u.</th><th>Dif. costo</th><th>Dif. PVP</th><th style="text-align:left">Tipo</th><th>Se descuenta</th></tr></thead><tbody>' +
+    (filas || '<tr><td colspan="' + (cs ? 11 : 9) + '" class="t muted">Sin resultados</td></tr>') + '</tbody>' +
+    '<tfoot><tr><td class="cod" colspan="' + (cs ? 7 : 5) + '">' + v.length + ' productos</td><td>' + din(sc) + '</td><td>' + din(sp) + '</td><td></td><td>' + din(sd) + '</td></tr></tfoot></table>';
+}
+
+function csv(inv) {
+  var c = function (s) { s = String(s == null ? '' : s); return /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  var n = function (x) { return (Number(x) || 0).toFixed(2).replace('.', ','); };
+  var out = [['Tienda', 'Fecha', 'Código', 'Descripción', 'Sistema', 'Físico', 'Diferencia', 'Costo unitario', 'PVP unitario', 'Dif. costo', 'Dif. PVP', 'Tipo', 'Se descuenta', 'Nota'].join(';')];
+  inv.items.forEach(function (i) {
+    out.push([inv.tienda, inv.fecha, i.cod, i.desc, i.sis == null ? '' : i.sis, i.fis == null ? '' : i.fis, i.dif, n(i.costo), n(i.pvp), n(i.dif * i.costo), n(i.dif * i.pvp), tipoDe(i), i.cobra && i.dif < 0 ? 'Sí' : 'No', i.nota].map(c).join(';'));
+  });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + out.join('\r\n')], {type: 'text/csv;charset=utf-8'}));
+  a.download = 'Inventario ' + inv.tienda + ' ' + inv.fecha + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+inicio();
+</script>
+</body>
+</html>
