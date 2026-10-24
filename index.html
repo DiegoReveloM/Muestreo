@@ -173,9 +173,30 @@ function cargarLocal() {
 }
 function guardarLocal() { guardarLS(claveLocal(), JSON.stringify({l: S.local, m: S.met, p: S.pend, q: S.lect, u: S.ult})); }
 
+/* Equipo con el que se cuenta (queda en cada lectura para la auditoría): sistema, modelo, navegador, pantalla e id fijo del equipo */
+var EQUIPO = (function () {
+  var u = navigator.userAgent || '', m, so = 'Otro', mod = '', nav = '';
+  if ((m = /iPhone OS (\d+(?:_\d+)*)/.exec(u))) so = 'iPhone · iOS ' + m[1].replace(/_/g, '.');
+  else if ((m = /(?:iPad|CPU) OS (\d+(?:_\d+)*)/.exec(u))) so = 'iPad · iOS ' + m[1].replace(/_/g, '.');
+  else if ((m = /Android (\d+(?:\.\d+)?)/.exec(u))) { so = 'Android ' + m[1]; var x = /Android [^;)]*; ([^;)]+?)(?: Build[^;)]*)?\)/.exec(u); if (x && x[1] !== 'K') mod = x[1]; }
+  else if (/Macintosh/.test(u)) so = navigator.maxTouchPoints > 1 ? 'iPad · iPadOS' : 'Mac';
+  else if (/Windows/.test(u)) so = 'Windows';
+  nav = /EdgA?\//.test(u) ? 'Edge' : /SamsungBrowser/.test(u) ? 'Samsung Internet' : /CriOS|Chrome\//.test(u) ? 'Chrome' : /FxiOS|Firefox\//.test(u) ? 'Firefox' : /Safari\//.test(u) ? 'Safari' : 'Otro navegador';
+  var id = '';
+  try { id = localStorage.getItem('mue.equipo') || ''; if (!id) { id = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('mue.equipo', id); } } catch (e) {}
+  var eq = {so: so, mod: mod, nav: nav, pant: (screen.width || 0) + '×' + (screen.height || 0), id: id};
+  /* Android con Chrome oculta el modelo en el texto del navegador; se pide aparte */
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']).then(function (h) {
+      if (h.model) eq.mod = h.model;
+    }).catch(function () {});
+  } catch (e) {}
+  return {texto: function () { return [eq.so, eq.mod, eq.nav, eq.pant, eq.id ? 'equipo ' + eq.id : ''].filter(Boolean).join(' · '); }};
+})();
+
 /* Registra una lectura (las 3 últimas quedan a la vista; todas se envían al servidor) */
 function anotar(raw, it, metodo, n) {
-  var l = {t: Date.now(), raw: String(raw), cod: it ? it.cod : '', desc: it ? it.desc : '', m: metodo, n: n == null ? '' : n, ok: !!it};
+  var l = {t: Date.now(), raw: String(raw), cod: it ? it.cod : '', desc: it ? it.desc : '', m: metodo, n: n == null ? '' : n, ok: !!it, eq: EQUIPO.texto()};
   S.ult.unshift(l); S.ult = S.ult.slice(0, 3);
   S.lect.push(l);
   guardarLocal(); programarEnvio(); pintarUltimos();
@@ -199,7 +220,7 @@ function enviarPendientes() {
   var keys = Object.keys(S.pend), lect = S.lect.slice();
   if ((!keys.length && !lect.length) || enviarPendientes.ocupado) return Promise.resolve();
   enviarPendientes.ocupado = true;
-  var lista = keys.map(function (c) { return {cod: c, n: S.local[c], m: S.met[c]}; });
+  var lista = keys.map(function (c) { return {cod: c, n: S.local[c], m: S.met[c], eq: EQUIPO.texto()}; });
   return call('apiMueGuardar', TOKEN, S.quien, S.d.ronda, lista, lect).then(function () {
     keys.forEach(function (c) { delete S.pend[c]; });
     S.lect = S.lect.slice(lect.length);
