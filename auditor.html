@@ -360,5 +360,20 @@ function csvLecturas() {
 
 inicio();
 </script>
+<script>/* etiquetas de tiendas (Diego 2026-10-24): solo el nombre visible, la clave interna sigue igual */
+(function(){
+  var R=[[/\bMegakywi\b(?!-EloyAlfaro)/g,'Megakywi-EloyAlfaro'],[/\bMegamaxi\b(?! 6 Dic)/g,'Megamaxi 6 Dic']];
+  var fix=function(s){return R.reduce(function(a,r){return a.replace(r[0],r[1]);},s);};
+  var SKIP={SCRIPT:1,STYLE:1,TEXTAREA:1,INPUT:1};
+  function walk(n){
+    if(n.nodeType===3){ if(/Mega(kywi|maxi)/.test(n.nodeValue)){var v=fix(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v;} return; }
+    if(n.nodeType!==1||SKIP[n.nodeName]) return;
+    for(var c=n.firstChild;c;c=c.nextSibling) walk(c);
+  }
+  walk(document.body); var t=fix(document.title); if(t!==document.title) document.title=t;
+  new MutationObserver(function(ms){ ms.forEach(function(m){ if(m.type==='characterData') walk(m.target); else m.addedNodes.forEach(walk); }); })
+    .observe(document.body,{childList:true,subtree:true,characterData:true});
+})();
+</script>
 </body>
 </html>
