@@ -294,6 +294,10 @@ function pintarConteo() {
     '<p class="small muted" style="margin:8px 0 0">' + misHtml() + 'Cuenta todas las unidades de cada producto que haya en la tienda.</p></div>';
   if (esGerente()) h += '<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn sec" id="bRepartir" style="flex:1;font-size:14px">👥 Repartir la lista</button>' +
     '<button class="btn sec" id="bCompartir" style="flex:1;font-size:14px">🔗 Enlace para el equipo</button></div>';
+  /* pt3: recordatorio de lo pendiente de la semana pasada */
+  var pendS = d.items.filter(function (i) { return i.pend; });
+  if (pendS.length && !r2) h += '<div class="aviso warn"><b>⏳ Pendiente de la semana pasada.</b> ' + (pendS.length === 1 ? 'Este producto quedó' : 'Estos ' + pendS.length + ' productos quedaron') +
+    ' pendiente' + (pendS.length === 1 ? '' : 's') + ' en el inventario anterior y se vuelve' + (pendS.length === 1 ? '' : 'n') + ' a contar: ' + pendS.map(function (i) { return esc(i.desc); }).join(', ') + '. Cuéntalos con cuidado.</div>';
   h += '<button class="btn grande" id="bScan"><span style="font-size:24px">📷</span> Escanear código</button>';
   h += '<div class="digita">' + entradaManual('dCod', 'dOk') + '</div>';
   h += '<div id="ultimos"></div>';
@@ -340,7 +344,7 @@ function pintarLista() {
   var pend = its.filter(function (i) { return !contadoPorAlguien(i.cod); }), hechos = its.filter(function (i) { return contadoPorAlguien(i.cod); });
   var fila = function (i) {
     var q = miCant(i.cod), a = asignado(i.cod);
-    return '<div class="it" data-c="' + esc(i.cod) + '"><span class="ck">' + (contadoPorAlguien(i.cod) ? '✓' : '') + '</span><div class="d"><b>' + esc(i.desc) + '</b><small>' + esc(i.cod) +
+    return '<div class="it" data-c="' + esc(i.cod) + '"><span class="ck">' + (contadoPorAlguien(i.cod) ? '✓' : '') + '</span><div class="d"><b>' + (i.pend ? '⏳ ' : '') + esc(i.desc) + '</b><small>' + esc(i.cod) + (i.pend ? ' · pendiente de la semana pasada' : '') +
       (i.barras.length ? '' : ' · sin código de barras') + (a && a !== S.quien ? ' · le toca a ' + esc(a) : '') +
       (S.met[i.cod] ? ' · ' + esc(S.met[i.cod].toLowerCase()) : '') + '</small></div><span class="q' + (q != null ? ' si' : '') + '">' + (q != null ? q : '–') + '</span></div>';
   };
