@@ -41,6 +41,22 @@ select{font:inherit;font-size:13px;padding:3px 6px;border-radius:8px;border:1px 
 .cam .ctl button,.cam .ctl label{font:inherit;font-size:16px;font-weight:600;border:0;border-radius:12px;padding:12px 18px;background:#fff;color:#14213D;cursor:pointer}
 .cam .st{position:absolute;top:16px;left:0;right:0;text-align:center;color:#fff;font-size:15px;text-shadow:0 1px 3px #000}
 .btn2{border:2px solid var(--acc);border-radius:12px;background:transparent;color:var(--acc);font-size:15px;font-weight:600;padding:0 12px;display:flex;align-items:center;cursor:pointer}
+.hd{display:flex;gap:14px;align-items:flex-start}
+.foto{width:112px;height:112px;background:#fff;border-radius:12px;border:1px solid var(--line);flex:none;overflow:hidden}
+.foto img{width:100%;height:100%;object-fit:contain}
+.ti{min-width:0}
+.nm{color:var(--mut);margin:2px 0 4px;font-size:15px}
+.pre{font-size:28px;font-weight:800;line-height:1.1;margin-bottom:6px}.pre small{font-size:13px;font-weight:500;color:var(--mut)}
+.tag{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px;vertical-align:middle}
+.tag.ok{background:#DCFCE7;color:#166534}.tag.warn{background:#FEF3C7;color:#92400E}.tag.bad{background:#FEE2E2;color:#991B1B}.tag.top{background:var(--hl);color:var(--acc)}
+.dsc{font-size:14px;margin:10px 0 4px;line-height:1.45}
+.ficha{display:inline-block;font-size:14px;color:var(--acc);margin:4px 0 2px;font-weight:600}
+.aviso{font-size:13px;color:#92400E;background:#FEF3C7;border-radius:8px;padding:6px 10px;margin-top:8px}
+.row small{color:var(--mut);font-size:12px;margin-left:4px}
+.row.bod span:first-child{font-weight:600}
+.sin{font-size:13px;color:var(--mut);margin-top:8px}
+.lleg{margin-top:10px;font-size:14px;font-weight:600;color:var(--acc)}
+.it.rem{display:flex;gap:10px;align-items:center}.it.rem img{width:52px;height:52px;object-fit:contain;background:#fff;border-radius:8px;flex:none}
 </style></head><body>
 <div class="w">
  <div class="bar">
@@ -55,7 +71,10 @@ select{font:inherit;font-size:13px;padding:3px 6px;border-radius:8px;border:1px 
 <script src="data.enc.js"></script>
 <script>
 const T=["Mall del Sol","Urdesa","Samborondón","Condado","El Jardín","Portal","Scala","Megakywi","Megamaxi","Tumbaco","CEDIS Quito","CEDIS Guayaquil"];
-const GYE=[0,1,2],UIO=[3,4,5,6,7,8,9],CED=[10,11],TIE=[...UIO,...GYE];
+const GYE=[0,1,2],UIO=[3,4,5,6,7,8,9],CED=[10,11],TIE=[...UIO,...GYE],O=12;
+// Ubicación aproximada de cada local (lat, lon) para ordenar por cercanía
+const GEO=[[-2.1545,-79.8919],[-2.1689,-79.9056],[-2.1405,-79.8667],[-0.1023,-78.4898],[-0.1797,-78.4846],[-0.1153,-78.4705],[-0.2003,-78.4327],[-0.1718,-78.4757],[-0.1755,-78.4794],[-0.2108,-78.4048],[-0.1650,-78.4700],[-2.1600,-79.9000]];
+const dist=(a,b)=>Math.hypot(GEO[a][0]-GEO[b][0],(GEO[a][1]-GEO[b][1])*Math.cos(GEO[a][0]*Math.PI/180));
 let D=[],F="";
 const byCode=new Map(),byBar=new Map();
 async function cargar(){
@@ -72,24 +91,44 @@ const $=s=>document.querySelector(s),q=$("#q"),out=$("#out");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase();
 let mi=-1,rec=[],cur=null;
-try{mi=+(localStorage.getItem("st.tienda")??-1);rec=JSON.parse(localStorage.getItem("st.rec")||"[]")}catch(e){}
+try{mi=+(localStorage.getItem("st.tienda")??-1);const ht=new URLSearchParams(location.hash.slice(1)).get("tienda");if(ht!==null&&+ht>=0&&+ht<10){mi=+ht;localStorage.setItem("st.tienda",mi)}rec=JSON.parse(localStorage.getItem("st.rec")||"[]")}catch(e){}
 function meta(){
  $("#meta").innerHTML=`Stock del ERP · ${esc(F)} · Mi tienda: <select id="mi"><option value="-1">—</option>${T.slice(0,10).map((t,i)=>`<option value="${i}"${i==mi?" selected":""}>${t}</option>`).join("")}</select>`;
  $("#mi").onchange=e=>{mi=+e.target.value;try{localStorage.setItem("st.tienda",mi)}catch(_){}if(cur)show(cur);q.focus()}}
 function bind(){out.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{const p=byCode.get(b.dataset.c);q.value=p[0];show(p);q.focus()})}
-const sum=(ix,p)=>ix.reduce((a,i)=>a+Math.max(0,p[4+i]),0);
-function rows(ix,p){
- const o=[...ix].sort((a,b)=>(b==mi)-(a==mi)||p[4+b]-p[4+a]);
- return o.map(i=>{const n=p[4+i];return `<div class="row${n<=0?" z":""}${i==mi?" me":""}"><span>${T[i]}</span><span class="n">${n}</span></div>`}).join("")}
+const sum=(ix,p)=>ix.reduce((a,i)=>a+Math.max(0,p[O+i]),0);
+function orden(){
+ // Sin tienda: bodega de Quito, tiendas de Quito, bodega de Guayaquil, tiendas de Guayaquil.
+ if(mi<0)return [10,...UIO,11,...GYE];
+ const uio=UIO.includes(mi),bod=uio?10:11,otraB=uio?11:10;
+ const misC=(uio?UIO:GYE).filter(i=>i!=mi).sort((x,y)=>dist(mi,x)-dist(mi,y));
+ const otras=(uio?GYE:UIO).slice().sort((x,y)=>dist(mi,x)-dist(mi,y));
+ return [mi,bod,...misC,otraB,...otras]}
+const nom=i=>i==10?"Bodega Quito":i==11?"Bodega Guayaquil":T[i];
+function rows(p){
+ const o=orden(),con=o.filter(i=>p[O+i]>0||i==mi),sin=o.filter(i=>p[O+i]<=0&&i!=mi);
+ const km=i=>mi>=0&&i!=mi?`<small>${Math.max(1,Math.round(dist(mi,i)*111))} km</small>`:"";
+ return con.map(i=>{const n=p[O+i];return `<div class="row${n<=0?" z":""}${i==mi?" me":""}${i>=10?" bod":""}"><span>${i==mi?"Aquí · ":""}${nom(i)} ${km(i)}</span><span class="n">${n}</span></div>`}).join("")
+  +(sin.length?`<div class="sin">Sin stock: ${sin.map(nom).join(", ")}</div>`:"")}
 function recent(){const r=rec.filter(c=>byCode.has(c)&&(!cur||c!==cur[0]));return r.length?`<div class="grp">Recientes</div><div class="rec">${r.map(c=>`<button data-c="${esc(c)}">${esc(c)}</button>`).join("")}</div>`:""}
+const ESTC={"Línea":"ok","Nuevo":"ok","Por Rematar":"warn","Por Devolver":"warn","Descontinuado":"bad"};
+const IMG=u=>u?`<img src="${esc(u)}" alt="" loading="lazy" onerror="this.style.display='none'">`:"";
 function show(p){cur=p;
  rec=[p[0],...rec.filter(c=>c!==p[0])].slice(0,8);try{localStorage.setItem("st.rec",JSON.stringify(rec))}catch(e){}
- out.innerHTML=`<div class="card"><div class="cod">${esc(p[0])}</div><div class="desc">${esc(p[1])}${p[3]?` · $${p[3].toFixed(2)} con IVA`:""}</div>
- <div class="tot"><span>Total en tiendas</span><b>${sum(TIE,p)}</b></div>
- <div class="grp">Quito · ${sum(UIO,p)}</div>${rows(UIO,p)}
- <div class="grp">Guayaquil · ${sum(GYE,p)}</div>${rows(GYE,p)}
- <div class="grp">CEDIS · ${sum(CED,p)}</div>${rows(CED,p)}
- <div class="desc" style="margin-top:8px;font-size:12px">Barras: ${esc(p[2]||"—")}</div></div>`+recent();
+ const [cod,nm,bar,pre,est,lleg,top,rem,img,url,desc,noerp]=p;
+ const tt=sum([...TIE,...CED],p);
+ const rems=rem.map(c=>byCode.get(c)).filter(Boolean);
+ out.innerHTML=`<div class="card"><div class="hd">${img?`<div class="foto">${IMG(img)}</div>`:""}<div class="ti"><div class="cod">${esc(cod)}${top?' <span class="tag top">Top ventas</span>':""}</div>
+ <div class="nm">${esc(nm)}</div>
+ <div class="pre">${pre?"$"+pre.toFixed(2):"Precio por confirmar"}<small>${pre?" con IVA":""}</small></div>
+ <span class="tag ${ESTC[est]||"bad"}">${esc(est)}</span></div></div>
+ ${desc?`<div class="dsc">${esc(desc)}</div>`:""}
+ ${url?`<a class="ficha" href="${esc(url)}" target="_blank" rel="noopener">Ver ficha completa en steren.com.mx</a>`:""}
+ ${noerp?'<div class="aviso">Este código aún no está creado en el ERP.</div>':""}
+ <div class="tot"><span>Disponible en total</span><b>${tt}</b></div>
+ ${rows(p)}
+ ${lleg?`<div class="lleg">${esc(lleg)}</div>`:""}
+ </div>`+(rems.length?`<div class="grp">Reemplazo sugerido</div>`+rems.map(x=>`<button class="it rem" data-c="${esc(x[0])}">${IMG(x[8])}<span><b>${esc(x[0])}</b> · $${x[3].toFixed(2)} · ${sum([...TIE,...CED],x)} disponibles<br><small>${esc(x[1])}</small></span></button>`).join(""):"")+recent();
  bind()}
 function find(raw,enter){
  const s=raw.trim();
@@ -101,7 +140,7 @@ function find(raw,enter){
  for(const x of D){const h=norm(x[0]+" "+x[1]+" "+x[2]);if(k.every(w=>h.includes(w))){hits.push(x);if(hits.length>=30)break}}
  if(hits.length===1&&enter){show(hits[0]);q.select();return}
  cur=null;
- out.innerHTML=hits.length?hits.map(x=>`<button class="it" data-c="${esc(x[0])}"><b>${esc(x[0])}</b> · ${sum(TIE,x)} en tiendas<br><small>${esc(x[1])}</small></button>`).join(""):`<div class="msg">No encontré “${esc(s)}”.</div>`;
+ out.innerHTML=hits.length?hits.map(x=>`<button class="it" data-c="${esc(x[0])}"><b>${esc(x[0])}</b> · ${sum([...TIE,...CED],x)} disponibles<br><small>${esc(x[1])}</small></button>`).join(""):`<div class="msg">No encontré “${esc(s)}”.</div>`;
  bind()}
 let tm;
 q.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(()=>find(q.value,false),120)});
