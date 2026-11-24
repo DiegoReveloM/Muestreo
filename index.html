@@ -547,20 +547,23 @@ function pintarExplicar() {
 
 function unidades(d) {
   var r = d.resumen; if (!r) return null;
-  var f = 0, s = 0, vf = 0, vs = 0;
+  var f = 0, s = 0, vf = 0, vs = 0, hay = false;
   d.items.forEach(function (i) {
     if (i.estado !== 'Diferencia' || !i.dif) return;
+    if (i.difp != null) hay = true;
     if (i.dif < 0) { f -= i.dif; vf += i.difp || 0; } else { s += i.dif; vs += i.difp || 0; }
   });
-  return {exactitud: r.exactitud, ok: r.ok, total: r.total, uFaltan: f, uSobran: s, faltante: vf, sobrante: vs};
+  return {exactitud: r.exactitud, ok: r.ok, total: r.total, uFaltan: f, uSobran: s, faltante: hay ? vf : null, sobrante: hay ? vs : null};
 }
 
 function resumenHtml(r) {
   if (!r) return '';
   return '<div class="card"><b>Resultado</b><div class="res3"><div><b>' + r.exactitud + '%</b><span>exactitud (' + r.ok + ' de ' + r.total + ')</span></div>' +
     /* sc1: la tienda nunca ve dinero al costo; las diferencias se valoran a PVP (decisión de Diego 24-nov) */
-    '<div><b style="color:var(--bad)">' + dinero(r.faltante) + '</b><span>faltante a PVP (' + r.uFaltan + ' u.)</span></div>' +
-    '<div><b>' + dinero(r.sobrante) + '</b><span>sobrante a PVP (' + r.uSobran + ' u.)</span></div></div></div>';
+    (r.faltante == null
+      ? '<div><b style="color:var(--bad)">' + r.uFaltan + '</b><span>unidades faltantes</span></div><div><b>' + r.uSobran + '</b><span>unidades sobrantes</span></div>'
+      : '<div><b style="color:var(--bad)">' + dinero(r.faltante) + '</b><span>faltante a PVP (' + r.uFaltan + ' u.)</span></div>' +
+        '<div><b>' + dinero(r.sobrante) + '</b><span>sobrante a PVP (' + r.uSobran + ' u.)</span></div>') + '</div></div>';
 }
 
 function pintarEnviado() {
