@@ -512,7 +512,7 @@ function confirmarCierre() {
 /* ---------- Diferencias y envío ---------- */
 function pintarExplicar() {
   var d = S.d, difs = d.items.filter(function (i) { return i.estado === 'Diferencia'; });
-  var h = resumenHtml(d.resumen);
+  var h = resumenHtml(unidades(d));
   if (!esGerente()) {
     $('app').innerHTML = h + '<div class="aviso warn">El conteo ya se cerró. ' + esc(d.gerente) + ' tiene que revisar las diferencias y enviarlas.</div>';
     return;
@@ -521,7 +521,7 @@ function pintarExplicar() {
   h += difs.map(function (i) {
     return '<div class="card dif" data-c="' + esc(i.cod) + '"><b>' + esc(i.desc) + '</b><div class="small muted">' + esc(i.cod) + '</div>' +
       '<div class="small n" style="margin:6px 0 10px">Sistema <b>' + i.teo + '</b> · Contado <b>' + i.c + '</b> · ' +
-      '<b style="color:' + (i.dif < 0 ? 'var(--bad)' : 'var(--warn)') + '">' + (i.dif > 0 ? 'Sobran ' : 'Faltan ') + Math.abs(i.dif) + '</b> (' + dinero(i.difd) + ')</div>' +
+      '<b style="color:' + (i.dif < 0 ? 'var(--bad)' : 'var(--warn)') + '">' + (i.dif > 0 ? 'Sobran ' : 'Faltan ') + Math.abs(i.dif) + '</b>' + (i.difp != null ? ' (' + dinero(i.difp) + ' a PVP)' : '') + '</div>' +
       '<select class="causa"><option value="">Causa…</option>' + d.causas.map(function (c) { return '<option' + (i.causa === c ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>' +
       '<textarea class="exp" style="margin-top:8px" placeholder="Qué revisaste y qué encontraste (ventas, ingresos, devoluciones, transferencias)">' + esc(i.exp || leerLS('mue.exp.' + TOKEN + '.' + i.cod)) + '</textarea></div>';
   }).join('');
@@ -545,18 +545,32 @@ function pintarExplicar() {
   };
 }
 
+function unidades(d) {
+  var r = d.resumen; if (!r) return null;
+  var f = 0, s = 0, vf = 0, vs = 0, hay = false;
+  d.items.forEach(function (i) {
+    if (i.estado !== 'Diferencia' || !i.dif) return;
+    if (i.difp != null) hay = true;
+    if (i.dif < 0) { f -= i.dif; vf += i.difp || 0; } else { s += i.dif; vs += i.difp || 0; }
+  });
+  return {exactitud: r.exactitud, ok: r.ok, total: r.total, uFaltan: f, uSobran: s, faltante: hay ? vf : null, sobrante: hay ? vs : null};
+}
+
 function resumenHtml(r) {
   if (!r) return '';
   return '<div class="card"><b>Resultado</b><div class="res3"><div><b>' + r.exactitud + '%</b><span>exactitud (' + r.ok + ' de ' + r.total + ')</span></div>' +
-    '<div><b style="color:var(--bad)">' + dinero(r.faltante) + '</b><span>faltante al costo</span></div>' +
-    '<div><b>' + dinero(r.sobrante) + '</b><span>sobrante al costo</span></div></div></div>';
+    /* sc1: la tienda nunca ve dinero al costo; las diferencias se valoran a PVP (decisión de Diego 24-nov) */
+    (r.faltante == null
+      ? '<div><b style="color:var(--bad)">' + r.uFaltan + '</b><span>unidades faltantes</span></div><div><b>' + r.uSobran + '</b><span>unidades sobrantes</span></div>'
+      : '<div><b style="color:var(--bad)">' + dinero(r.faltante) + '</b><span>faltante a PVP (' + r.uFaltan + ' u.)</span></div>' +
+        '<div><b>' + dinero(r.sobrante) + '</b><span>sobrante a PVP (' + r.uSobran + ' u.)</span></div>') + '</div></div>';
 }
 
 function pintarEnviado() {
   var d = S.d, difs = d.items.filter(function (i) { return i.estado === 'Diferencia'; });
-  $('app').innerHTML = '<div class="aviso ok"><b>Enviado.</b> Diego y los supervisores ya tienen el resultado de esta semana.</div>' + resumenHtml(d.resumen) +
+  $('app').innerHTML = '<div class="aviso ok"><b>Enviado.</b> Diego y los supervisores ya tienen el resultado de esta semana.</div>' + resumenHtml(unidades(d)) +
     (difs.length ? '<div class="titulo">Diferencias enviadas</div>' + difs.map(function (i) {
-      return '<div class="card dif"><b>' + esc(i.desc) + '</b><div class="small muted">' + esc(i.cod) + ' · sistema ' + i.teo + ' · contado ' + i.c + ' · ' + dinero(i.difd) + '</div>' +
+      return '<div class="card dif"><b>' + esc(i.desc) + '</b><div class="small muted">' + esc(i.cod) + ' · sistema ' + i.teo + ' · contado ' + i.c + (i.difp != null ? ' · ' + dinero(i.difp) + ' a PVP' : '') + '</div>' +
         '<div class="small" style="margin-top:6px"><b>' + esc(i.causa) + ':</b> ' + esc(i.exp) + '</div></div>';
     }).join('') : '');
 }
